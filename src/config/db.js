@@ -24,10 +24,7 @@ const loadModels = () => {
 // Function to connect to the database
 const connectDB = async () => {
   try {
-    await mongoose.connect(dbUrl, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(dbUrl);
     console.log("Database connection successful");
 
     // Dynamically load models after successful connection

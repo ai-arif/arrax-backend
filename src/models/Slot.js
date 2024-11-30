@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const slotSchema = new mongoose.Schema(
   {
     userId: { type: Number, required: true, index: true },

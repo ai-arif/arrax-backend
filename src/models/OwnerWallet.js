@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const ownerWalletSchema = new mongoose.Schema(
   {
     walletAddress: { type: String, required: true },

@@ -1,69 +1,83 @@
 const User = require("../models/User");
 const Slot = require("../models/Slot");
-const jwt = require("jsonwebtoken");
+const { generateToken } = require("./tokenService");
 
-// Environment variables
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
-
-// Login or register a user
-const loginOrRegisterUser = async ({ walletAddress, fullName, referredBy }) => {
-  // Check if the user exists
-  let user = await User.findOne({ walletAddress });
-
-  if (user) {
-    // If user exists, generate a login token
-    const token = jwt.sign(
-      { userId: user.userId, walletAddress: user.walletAddress },
-      JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-    return { user, token, isNewUser: false };
+const registerOwner = async ({ walletAddress, fullName }) => {
+  const existingOwner = await User.findOne({ isOwner: true });
+  if (existingOwner) {
+    throw new Error("An owner already exists. Only one owner is allowed.");
   }
 
-  // If user does not exist, ensure referral ID and full name are provided
-  if (!referredBy || !fullName) {
-    throw new Error("ReferredBy and fullName are required for registration");
-  }
-
-  // Check if the referredBy user exists
-  const referrer = await User.findOne({ userId: referredBy });
-  if (!referrer) {
-    throw new Error("Invalid referral ID");
-  }
-
-  // Determine if the new user is the owner
-  const isOwner = (await User.countDocuments()) === 0;
-
-  // Create the new user
-  user = await User.create({
+  const user = await User.create({
     fullName,
     walletAddress,
-    referredBy,
-    isOwner,
+    referredBy: null, // No referrer for the owner
+    isOwner: true,
+    userId: 1, // Set userId to 1 for the owner
   });
 
-  // Add the new user to the referrer's direct referrals
-  referrer.directReferrals.push(user.userId);
-  referrer.totalTeam += 1;
-  await referrer.save();
-
-  // Automatically create slots for the new user
+  // Create slots for the owner
   for (let i = 1; i <= 10; i++) {
     await Slot.create({
       userId: user.userId,
       slotNumber: i,
-      isActive: i === 1, // Activate the first slot by default
+      isActive: i === 1,
     });
   }
 
-  // Generate a login token for the new user
-  const token = jwt.sign(
-    { userId: user.userId, walletAddress: user.walletAddress },
-    JWT_SECRET,
-    { expiresIn: "7d" }
-  );
+  const token = generateToken({
+    userId: user.userId,
+    walletAddress: user.walletAddress,
+  });
+
+  return { user, token };
+};
+
+const loginOrRegisterUser = async ({ walletAddress, fullName, referredBy }) => {
+  let user = await User.findOne({ walletAddress });
+
+  if (user) {
+    const token = generateToken({
+      userId: user.userId,
+      walletAddress: user.walletAddress,
+    });
+    return { user, token, isNewUser: false };
+  }
+
+  if (!referredBy || !fullName) {
+    throw new Error("Full name and referral ID are required for registration.");
+  }
+
+  const referrer = await User.findOne({ userId: referredBy });
+  if (!referrer) {
+    throw new Error("Invalid referral ID.");
+  }
+
+  user = await User.create({
+    fullName,
+    walletAddress,
+    referredBy,
+    isOwner: false,
+  });
+
+  referrer.directReferrals.push(user.userId);
+  referrer.totalTeam += 1;
+  await referrer.save();
+
+  for (let i = 1; i <= 10; i++) {
+    await Slot.create({
+      userId: user.userId,
+      slotNumber: i,
+      isActive: i === 1,
+    });
+  }
+
+  const token = generateToken({
+    userId: user.userId,
+    walletAddress: user.walletAddress,
+  });
 
   return { user, token, isNewUser: true };
 };
 
-module.exports = { loginOrRegisterUser };
+module.exports = { registerOwner, loginOrRegisterUser };

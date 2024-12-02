@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const userSchema = new mongoose.Schema(
   {
@@ -7,11 +8,10 @@ const userSchema = new mongoose.Schema(
       unique: true,
       required: true,
       index: true,
-      autoIncrement: true,
     },
     fullName: { type: String, required: true },
     walletAddress: { type: String, unique: true, required: true },
-    referredBy: { type: Number, required: true }, // Referral's userId
+    referredBy: { type: Number, required: false }, // Referral's userId
     isOwner: { type: Boolean, default: false }, // Set true for the system owner
     directReferrals: { type: [Number], default: [] }, // Array of userIds directly referred by this user
     totalTeam: { type: Number, default: 0 }, // Total users under this user
@@ -25,5 +25,8 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Attach auto-increment plugin for userId
+userSchema.plugin(AutoIncrement, { inc_field: "userId" });
 
 module.exports = mongoose.model("User", userSchema);

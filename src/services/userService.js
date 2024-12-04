@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Slot = require("../models/Slot");
 const { generateToken } = require("./tokenService");
+const getNextSequence = require("../utils/getNextSequence");
 
 const registerOwner = async ({ walletAddress, fullName }) => {
   const existingOwner = await User.findOne({ isOwner: true });
@@ -53,7 +54,10 @@ const loginOrRegisterUser = async ({ walletAddress, fullName, referredBy }) => {
     throw new Error("Invalid referral ID.");
   }
 
+  const nextUserId = await getNextSequence("userId"); // Fetch the next userId
+
   user = await User.create({
+    userId: nextUserId,
     fullName,
     walletAddress,
     referredBy,

@@ -12,7 +12,10 @@ app.use(express.json());
 
 connectDB();
 app.get("/", (req, res) => {
-  res.send("Hello World");
+  // return the ip address of the client
+  const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+  // response as json
+  res.json({ ip });
 });
 
 // Routes

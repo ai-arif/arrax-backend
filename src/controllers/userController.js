@@ -36,11 +36,6 @@ const handleOwnerRegistration = async (req, res) => {
   }
 };
 
-/**
- * Controller to handle user login or registration.
- * @param {Object} req - Express request object.
- * @param {Object} res - Express response object.
- */
 const handleLoginOrRegistration = async (req, res) => {
   try {
     const { walletAddress, fullName, referredBy } = req.body;

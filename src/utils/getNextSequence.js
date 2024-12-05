@@ -4,7 +4,7 @@ const getNextSequence = async (counterName) => {
   const counter = await Counter.findByIdAndUpdate(
     counterName,
     { $inc: { seq: 1 } },
-    { new: true, upsert: true } // Create the counter if it doesn't exist
+    { new: true, upsert: true }
   );
   return counter.seq;
 };

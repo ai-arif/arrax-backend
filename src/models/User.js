@@ -22,6 +22,12 @@ const userSchema = new mongoose.Schema(
       directIncome: { type: Number, default: 0 }, // Income from direct referrals
       slotIncome: { type: Number, default: 0 }, // Income from slot transactions
     },
+    slots: [
+      {
+        slotId: { type: mongoose.Schema.Types.ObjectId, ref: "Slot" }, // Reference to Slot model
+        isActive: { type: Boolean, default: false },
+      },
+    ], // Slots associated with the user
   },
   { timestamps: true }
 );

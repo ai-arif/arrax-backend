@@ -121,4 +121,43 @@ const loginOrRegisterUser = async ({ walletAddress, fullName, referredBy }) => {
   return { user, token, isNewUser: true };
 };
 
-module.exports = { registerOwner, loginOrRegisterUser };
+// get user information by userId
+const getUserById = async (userId) => {
+  const user = await User.findOne({ userId });
+  return user;
+};
+
+const getGenerationLevels = async (userId) => {
+  const levels = [];
+  let currentUserId = userId;
+  let level = 1;
+
+  while (currentUserId) {
+    const user = await User.findOne({ userId: currentUserId }).lean();
+    if (!user) break;
+
+    // Fetch referrer and exclude the current user
+    const referrer = await User.findOne({ userId: user.referredBy }).lean();
+    if (referrer) {
+      levels.push({
+        level,
+        userId: referrer.userId,
+        fullName: referrer.fullName,
+        walletAddress: referrer.walletAddress,
+        income: referrer.income,
+      });
+    }
+
+    currentUserId = user.referredBy; // Move up the referral chain
+    level++; // Increment the level
+  }
+
+  return levels.sort((a, b) => a.level - b.level); // Ensure levels are sorted
+};
+
+module.exports = {
+  registerOwner,
+  loginOrRegisterUser,
+  getUserById,
+  getGenerationLevels,
+};

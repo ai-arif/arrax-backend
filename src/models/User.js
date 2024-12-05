@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema(
     },
     fullName: { type: String, required: true },
     walletAddress: { type: String, unique: true, required: true },
+    image: { type: String, required: false },
     referredBy: { type: Number, required: false }, // Referral's userId
     isOwner: { type: Boolean, default: false }, // Set true for the system owner
     directReferrals: { type: [Number], default: [] }, // Array of userIds directly referred by this user

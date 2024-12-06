@@ -1,3 +1,6 @@
+const sharp = require("sharp");
+const path = require("path");
+const fs = require("fs");
 const User = require("../models/User");
 const Slot = require("../models/Slot");
 const { generateToken } = require("./tokenService");
@@ -155,9 +158,42 @@ const getGenerationLevels = async (userId) => {
   return levels.sort((a, b) => a.level - b.level); // Ensure levels are sorted
 };
 
+// Ensure the uploads directory exists or create it
+const uploadDir = path.resolve(__dirname, "../uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const processImage = async (buffer) => {
+  try {
+    console.log("Processing image...");
+
+    // Generate processed image path
+    const processedPath = path.join(uploadDir, `processed-${Date.now()}.webp`);
+
+    // Use Sharp to process the image
+    await sharp(buffer)
+      .resize(800) // Resize image to 800px width (maintaining aspect ratio)
+      .toFormat("webp") // Convert to webp format
+      .toFile(processedPath);
+
+    const publicUrl = `${process.env.APP_URL}/uploads/${path.basename(
+      processedPath
+    )}`;
+
+    console.log("Processed image URL:", publicUrl);
+
+    return publicUrl;
+  } catch (error) {
+    console.error("Error processing image:", error.message);
+    throw new Error("Failed to process image.");
+  }
+};
+
 module.exports = {
   registerOwner,
   loginOrRegisterUser,
   getUserById,
   getGenerationLevels,
+  processImage,
 };

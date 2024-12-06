@@ -3,6 +3,7 @@ const {
   loginOrRegisterUser,
   getUserById,
   getGenerationLevels,
+  processImage,
 } = require("../services/userService");
 const sendResponse = require("../utils/sendResponse");
 
@@ -103,9 +104,31 @@ const getUserGenerationLevels = async (req, res) => {
   }
 };
 
+const uploadImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    // Process the image
+    const processedImagePath = await processImage(req.file.buffer);
+
+    res.status(200).json({
+      message: "Image uploaded and processed successfully",
+      processedImage: processedImagePath,
+    });
+  } catch (error) {
+    console.error(error.message);
+    res
+      .status(500)
+      .json({ message: "Failed to upload and process the image." });
+  }
+};
+
 module.exports = {
   handleOwnerRegistration,
   handleLoginOrRegistration,
   handleGetUserById,
   getUserGenerationLevels,
+  uploadImage,
 };

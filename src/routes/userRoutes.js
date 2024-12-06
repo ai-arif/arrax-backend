@@ -4,10 +4,26 @@ const {
   handleOwnerRegistration,
   handleGetUserById,
   getUserGenerationLevels,
+  uploadImage,
 } = require("../controllers/userController");
+
+const upload = require("../middlewares/multerConfig");
 
 const router = express.Router();
 
+// image upload
+router.post(
+  "/upload",
+  (req, res, next) => {
+    upload.single("image")(req, res, (err) => {
+      if (err) {
+        return res.status(400).json({ message: err.message });
+      }
+      next();
+    });
+  },
+  uploadImage
+);
 // Login or register route
 router.post("/connect-wallet", handleLoginOrRegistration);
 router.post("/register-owner", handleOwnerRegistration);

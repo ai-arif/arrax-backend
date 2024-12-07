@@ -111,7 +111,7 @@ const uploadImage = async (req, res) => {
     }
 
     // Process the image
-    const processedImagePath = await processImage(req.file.buffer);
+    const processedImagePath = await processImage(req.file.buffer, req.user);
 
     res.status(200).json({
       message: "Image uploaded and processed successfully",

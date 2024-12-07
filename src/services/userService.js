@@ -164,7 +164,7 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const processImage = async (buffer) => {
+const processImage = async (buffer, user) => {
   try {
     console.log("Processing image...");
 
@@ -180,8 +180,9 @@ const processImage = async (buffer) => {
     const publicUrl = `${process.env.APP_URL}/uploads/${path.basename(
       processedPath
     )}`;
-
-    console.log("Processed image URL:", publicUrl);
+    // Update the user's image field
+    user.image = publicUrl;
+    await user.save();
 
     return publicUrl;
   } catch (error) {

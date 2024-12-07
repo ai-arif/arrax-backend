@@ -8,12 +8,14 @@ const {
 } = require("../controllers/userController");
 
 const upload = require("../middlewares/multerConfig");
+const verifyToken = require("../middlewares/verifyToken");
 
 const router = express.Router();
 
 // image upload
 router.post(
-  "/upload",
+  "/update-picture",
+  verifyToken,
   (req, res, next) => {
     upload.single("image")(req, res, (err) => {
       if (err) {

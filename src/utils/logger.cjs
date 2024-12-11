@@ -1,4 +1,5 @@
 const winston = require("winston");
+require("winston-mongodb");
 const { createLogger, format, transports } = winston;
 
 const { combine, timestamp, json, colorize } = format;
@@ -16,10 +17,19 @@ const logger = createLogger({
   level: "info",
   format: combine(colorize(), timestamp(), json()),
   transports: [
-    new transports.Console({
-      format: consoleLogFormat,
+    // new transports.Console({
+    //   format: consoleLogFormat,
+    // }),
+    // new transports.File({ filename: "app.log" }),
+    new transports.MongoDB({
+      db: process.env.DB_URL, // MongoDB connection string from .env
+      collection: "logs", // Collection where logs will be stored
+      level: "info", // Minimum log level to store in MongoDB
+      format: combine(timestamp(), json()),
+      options: {
+        useUnifiedTopology: true, // Use the new MongoDB connection options
+      },
     }),
-    new transports.File({ filename: "app.log" }),
   ],
 });
 

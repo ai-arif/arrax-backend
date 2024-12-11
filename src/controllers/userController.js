@@ -4,6 +4,7 @@ const {
   getUserById,
   getGenerationLevels,
   processImage,
+  getSlotWithSubSlots,
 } = require("../services/userService");
 const sendResponse = require("../utils/sendResponse");
 
@@ -125,10 +126,29 @@ const uploadImage = async (req, res) => {
   }
 };
 
+// getSlotWithSubSlots make controller and receive userId from params
+const handleSlotWithSubSlots = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log("userId", userId);
+    const slotSubSlots = await getSlotWithSubSlots(userId);
+    return sendResponse(
+      res,
+      200,
+      true,
+      "Slot and sub-slots found.",
+      slotSubSlots
+    );
+  } catch (error) {
+    return sendResponse(res, 500, false, error.message, null);
+  }
+};
+
 module.exports = {
   handleOwnerRegistration,
   handleLoginOrRegistration,
   handleGetUserById,
   getUserGenerationLevels,
   uploadImage,
+  handleSlotWithSubSlots,
 };

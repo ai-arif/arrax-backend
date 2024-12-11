@@ -12,7 +12,6 @@ const registerOwner = async ({ walletAddress, fullName }) => {
   if (existingOwner) {
     throw new Error("An owner already exists. Only one owner is allowed.");
   }
-
   const user = await User.create({
     fullName,
     walletAddress,
@@ -214,10 +213,48 @@ const processImage = async (buffer, user) => {
   }
 };
 
+const getSlotWithSubSlots = async (userId) => {
+  try {
+    const result = await Slot.aggregate([
+      {
+        $match: { userId: userId }, // Filter slots by userId
+      },
+      {
+        $lookup: {
+          from: "subslots", // Collection name of SubSlot (usually pluralized automatically by Mongoose)
+          localField: "_id", // Field in Slot to match
+          foreignField: "slotId", // Field in SubSlot to match
+          as: "subSlots", // Resulting array field in the output
+        },
+      },
+      {
+        $project: {
+          slotNumber: 1,
+          isActive: 1,
+          sectionsCompleted: 1,
+          price: 1,
+          referrals: 1,
+          generationData: 1,
+          recycleCount: 1,
+          recycleUserCount: 1,
+          usersCount: 1,
+          subSlots: 1, // Include the joined subSlots
+        },
+      },
+    ]);
+
+    return result;
+  } catch (error) {
+    console.error("Error fetching slots with sub-slots:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   registerOwner,
   loginOrRegisterUser,
   getUserById,
   getGenerationLevels,
   processImage,
+  getSlotWithSubSlots,
 };

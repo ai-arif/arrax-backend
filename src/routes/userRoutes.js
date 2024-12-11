@@ -5,6 +5,7 @@ const {
   handleGetUserById,
   getUserGenerationLevels,
   uploadImage,
+  handleSlotWithSubSlots,
 } = require("../controllers/userController");
 
 const upload = require("../middlewares/multerConfig");
@@ -29,6 +30,7 @@ router.post(
 // Login or register route
 router.post("/connect-wallet", handleLoginOrRegistration);
 router.post("/register-owner", handleOwnerRegistration);
+router.get("/user/:userId/slot", handleSlotWithSubSlots);
 router.get("/user/:userId/generations", getUserGenerationLevels);
 router.get("/user/:userId", handleGetUserById);
 

@@ -21,6 +21,9 @@ const slotSchema = new mongoose.Schema(
         count: { type: Number, default: 0 }, // Number of users at this generation
       },
     ], // Generation-level data
+    recycleCount: { type: Number, default: 0 }, // Number of times the slot has been recycled
+    recycleUserCount: { type: Number, default: 0 }, // Number of users who have recycled this slot
+    usersCount: { type: Number, default: 0 }, // Number of users who have purchased this slot
   },
   { timestamps: true }
 );

@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const User = require("../models/User");
 const Slot = require("../models/Slot");
+const SubSlot = require("../models/SubSlot");
 const { generateToken } = require("./tokenService");
 const getNextSequence = require("../utils/getNextSequence");
 
@@ -103,17 +104,39 @@ const loginOrRegisterUser = async ({ walletAddress, fullName, referredBy }) => {
 
   await referrer.save();
 
-  // Create slots for the new user (all slots initially blocked)
-  const slotPrices = Slot.slotPrices; // Ensure slot prices are defined in the Slot model
+  // Create slots and sub-slots for the new user
+  const slotPrices = Slot.slotPrices;
+
+  const slots = [];
+  const subSlots = [];
 
   for (let i = 1; i <= 10; i++) {
-    await Slot.create({
+    // Prepare slot data
+    const slotData = {
       userId: user.userId,
       slotNumber: i,
       isActive: false, // All slots are blocked initially
       price: slotPrices[i - 1], // Assign slot price based on slot number
-    });
+    };
+    slots.push(slotData);
   }
+
+  // Create all slots in a single database call
+  const createdSlots = await Slot.insertMany(slots);
+
+  // Prepare sub-slot data for each created slot
+  createdSlots.forEach((slot) => {
+    for (let j = 1; j <= 12; j++) {
+      subSlots.push({
+        slotId: slot._id,
+        subSlotNumber: j,
+        isPurchased: false, // Initial state
+      });
+    }
+  });
+
+  // Create all sub-slots in a single database call
+  await SubSlot.insertMany(subSlots);
 
   // Generate a token for the new user
   const token = generateToken({

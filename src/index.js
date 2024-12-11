@@ -1,11 +1,32 @@
 require("dotenv").config();
 const express = require("express");
+const logger = require("./utils/logger.cjs");
+const morgan = require("morgan");
 const app = express();
 const port = process.env.PORT || 5000;
 const path = require("path");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const cors = require("cors");
+
+const morganFormat =
+  ":method :url :status :res[content-length] - :response-time ms";
+
+app.use(
+  morgan(morganFormat, {
+    stream: {
+      write: (message) => {
+        const logObject = {
+          method: message.split(" ")[0],
+          url: message.split(" ")[1],
+          status: message.split(" ")[2],
+          responseTime: message.split(" ")[3],
+        };
+        logger.info(JSON.stringify(logObject));
+      },
+    },
+  })
+);
 
 // Middleware
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

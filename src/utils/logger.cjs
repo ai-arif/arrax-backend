@@ -26,9 +26,6 @@ const logger = createLogger({
       collection: "logs", // Collection where logs will be stored
       level: "info", // Minimum log level to store in MongoDB
       format: combine(timestamp(), json()),
-      options: {
-        useUnifiedTopology: true, // Use the new MongoDB connection options
-      },
     }),
   ],
 });

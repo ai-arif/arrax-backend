@@ -24,6 +24,7 @@ const slotSchema = new mongoose.Schema(
     recycleCount: { type: Number, default: 0 }, // Number of times the slot has been recycled
     recycleUserCount: { type: Number, default: 0 }, // Number of users who have recycled this slot
     usersCount: { type: Number, default: 0 }, // Number of users who have purchased this slot
+    subSlotIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "SubSlot" }], // Array of sub-slot IDs
   },
   { timestamps: true }
 );

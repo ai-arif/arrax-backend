@@ -4,7 +4,7 @@ const {
   getUserById,
   getGenerationLevels,
   processImage,
-  getSlotWithSubSlots,
+  getSlotsWithSubSlots,
 } = require("../services/userService");
 const sendResponse = require("../utils/sendResponse");
 
@@ -130,8 +130,7 @@ const uploadImage = async (req, res) => {
 const handleSlotWithSubSlots = async (req, res) => {
   try {
     const { userId } = req.params;
-    console.log("userId", userId);
-    const slotSubSlots = await getSlotWithSubSlots(userId);
+    const slotSubSlots = await getSlotsWithSubSlots(userId);
     return sendResponse(
       res,
       200,

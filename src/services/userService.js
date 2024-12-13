@@ -135,7 +135,22 @@ const loginOrRegisterUser = async ({ walletAddress, fullName, referredBy }) => {
   });
 
   // Create all sub-slots in a single database call
-  await SubSlot.insertMany(subSlots);
+  const createdSubSlots = await SubSlot.insertMany(subSlots);
+
+  // Map and update slot documents with their corresponding sub-slot IDs
+  await Promise.all(
+    createdSlots.map(async (slot) => {
+      const subSlotIds = createdSubSlots
+        .filter((subSlot) => subSlot.slotId.toString() === slot._id.toString())
+        .map((subSlot) => subSlot._id);
+
+      // Update the slot document with subSlotIds
+      await Slot.updateOne(
+        { _id: slot._id },
+        { $set: { subSlotIds: subSlotIds } }
+      );
+    })
+  );
 
   // Generate a token for the new user
   const token = generateToken({
@@ -213,40 +228,50 @@ const processImage = async (buffer, user) => {
   }
 };
 
-const getSlotWithSubSlots = async (userId) => {
+const getSlotsWithSubSlots = async (userId) => {
   try {
-    const result = await Slot.aggregate([
+    const slotsWithSubSlots = await Slot.aggregate([
       {
-        $match: { userId: userId }, // Filter slots by userId
+        $match: { userId: parseInt(userId) }, // Match slots for the specific userId
       },
       {
         $lookup: {
-          from: "subslots", // Collection name of SubSlot (usually pluralized automatically by Mongoose)
-          localField: "_id", // Field in Slot to match
-          foreignField: "slotId", // Field in SubSlot to match
-          as: "subSlots", // Resulting array field in the output
+          from: "subslots", // Collection name for SubSlot (should be lowercase and plural)
+          localField: "subSlotIds", // Field in Slot that contains the ObjectIds for SubSlots
+          foreignField: "_id", // Field in SubSlot collection to match
+          as: "subSlots", // The field where the result will be stored
         },
       },
       {
-        $project: {
-          slotNumber: 1,
-          isActive: 1,
-          sectionsCompleted: 1,
-          price: 1,
-          referrals: 1,
-          generationData: 1,
-          recycleCount: 1,
-          recycleUserCount: 1,
-          usersCount: 1,
-          subSlots: 1, // Include the joined subSlots
+        $unwind: "$subSlots", // Deconstruct the subSlots array
+      },
+      {
+        $sort: {
+          "subSlots.subSlotNumber": 1, // Sort by subSlotNumber in ascending order
+        },
+      },
+      {
+        $group: {
+          _id: "$_id", // Group by Slot _id
+          userId: { $first: "$userId" },
+          slotNumber: { $first: "$slotNumber" },
+          isActive: { $first: "$isActive" },
+          sectionsCompleted: { $first: "$sectionsCompleted" },
+          price: { $first: "$price" },
+          recycleCount: { $first: "$recycleCount" },
+          recycleUserCount: { $first: "$recycleUserCount" },
+          usersCount: { $first: "$usersCount" },
+          // subSlotIds: { $first: "$subSlotIds" },
+          referrals: { $first: "$referrals" },
+          generationData: { $first: "$generationData" },
+          subSlots: { $push: "$subSlots" }, // Reassemble the sorted subSlots array
         },
       },
     ]);
 
-    return result;
+    return slotsWithSubSlots;
   } catch (error) {
-    console.error("Error fetching slots with sub-slots:", error);
-    throw error;
+    console.error("Error fetching slots and subSlots:", error);
   }
 };
 
@@ -256,5 +281,5 @@ module.exports = {
   getUserById,
   getGenerationLevels,
   processImage,
-  getSlotWithSubSlots,
+  getSlotsWithSubSlots,
 };

@@ -15,7 +15,7 @@ const router = express.Router();
 
 // image upload
 router.post(
-  "/update-picture",
+  "/update-profile",
   verifyToken,
   (req, res, next) => {
     upload.single("image")(req, res, (err) => {

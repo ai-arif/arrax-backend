@@ -77,6 +77,7 @@ const loginOrRegisterUser = async ({ walletAddress, fullName, referredBy }) => {
   // Update the referrer's direct referrals and total team count
   referrer.directReferrals.push(user.userId);
   referrer.totalTeam += 1;
+  referrer.totalPartners += 1;
 
   // Update generation data for up to 10 levels
   let currentReferrer = referrer;

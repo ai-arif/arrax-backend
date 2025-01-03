@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema(
     referredBy: { type: Number, required: false }, // Referral's userId
     isOwner: { type: Boolean, default: false }, // Set true for the system owner
     directReferrals: { type: [Number], default: [] }, // Array of userIds directly referred by this user
+    totalPartners: { type: Number, default: 0 }, // Total direct referrals
     totalTeam: { type: Number, default: 0 }, // Total users under this user
     activeTeam: { type: Number, default: 0 }, // Total active users under this user
     dailyIncome: { type: Number, default: 0 }, // Daily income

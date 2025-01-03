@@ -17,6 +17,9 @@ const userSchema = new mongoose.Schema(
     directReferrals: { type: [Number], default: [] }, // Array of userIds directly referred by this user
     totalTeam: { type: Number, default: 0 }, // Total users under this user
     activeTeam: { type: Number, default: 0 }, // Total active users under this user
+    dailyIncome: { type: Number, default: 0 }, // Daily income
+    dailyJoining: { type: Number, default: 0 }, // Daily joining
+
     income: {
       total: { type: Number, default: 0 },
       levelIncome: { type: Number, default: 0 }, // Income from levels

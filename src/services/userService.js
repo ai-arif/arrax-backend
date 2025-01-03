@@ -247,6 +247,7 @@ const getSlotsWithSubSlots = async (userId) => {
       },
       {
         $sort: {
+          slotNumber: 1, // Then sort by slotNumber in ascending order
           "subSlots.subSlotNumber": 1, // Sort by subSlotNumber in ascending order
         },
       },

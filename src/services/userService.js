@@ -236,24 +236,24 @@ const getSlotsWithSubSlots = async (userId) => {
       },
       {
         $lookup: {
-          from: "subslots", // Collection name for SubSlot (should be lowercase and plural)
-          localField: "subSlotIds", // Field in Slot that contains the ObjectIds for SubSlots
-          foreignField: "_id", // Field in SubSlot collection to match
-          as: "subSlots", // The field where the result will be stored
+          from: "subslots",
+          localField: "subSlotIds",
+          foreignField: "_id",
+          as: "subSlots",
         },
       },
       {
-        $unwind: "$subSlots", // Deconstruct the subSlots array
+        $unwind: "$subSlots",
       },
       {
         $sort: {
-          slotNumber: 1, // Then sort by slotNumber in ascending order
-          "subSlots.subSlotNumber": 1, // Sort by subSlotNumber in ascending order
+          slotNumber: 1, // Sort by slotNumber
+          "subSlots.subSlotNumber": 1, // Sort subSlots by subSlotNumber
         },
       },
       {
         $group: {
-          _id: "$_id", // Group by Slot _id
+          _id: "$_id",
           userId: { $first: "$userId" },
           slotNumber: { $first: "$slotNumber" },
           isActive: { $first: "$isActive" },
@@ -262,10 +262,14 @@ const getSlotsWithSubSlots = async (userId) => {
           recycleCount: { $first: "$recycleCount" },
           recycleUserCount: { $first: "$recycleUserCount" },
           usersCount: { $first: "$usersCount" },
-          // subSlotIds: { $first: "$subSlotIds" },
           referrals: { $first: "$referrals" },
           generationData: { $first: "$generationData" },
           subSlots: { $push: "$subSlots" }, // Reassemble the sorted subSlots array
+        },
+      },
+      {
+        $sort: {
+          slotNumber: 1, // Ensure the final response is sorted by slotNumber
         },
       },
     ]);

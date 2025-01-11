@@ -20,19 +20,17 @@ const userSchema = new mongoose.Schema(
     activeTeam: { type: Number, default: 0 }, // Total active users under this user
     dailyIncome: { type: Number, default: 0 }, // Daily income
     dailyJoining: { type: Number, default: 0 }, // Daily joining
-
+    roles: {
+      type: [String],
+      default: ["user"],
+      enum: ["user", "admin", "owner"],
+    },
     income: {
       total: { type: Number, default: 0 },
       levelIncome: { type: Number, default: 0 }, // Income from levels
       directIncome: { type: Number, default: 0 }, // Income from direct referrals
       slotIncome: { type: Number, default: 0 }, // Income from slot transactions
     },
-    slots: [
-      {
-        slotId: { type: mongoose.Schema.Types.ObjectId, ref: "Slot" }, // Reference to Slot model
-        isActive: { type: Boolean, default: false },
-      },
-    ], // Slots associated with the user
   },
   { timestamps: true }
 );

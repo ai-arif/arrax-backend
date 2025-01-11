@@ -34,6 +34,7 @@ const registerOwner = async ({ walletAddress, fullName }) => {
   const token = generateToken({
     userId: user.userId,
     walletAddress: user.walletAddress,
+    roles: user?.roles,
   });
 
   return { user, token };
@@ -47,6 +48,7 @@ const loginOrRegisterUser = async ({ walletAddress, fullName, referredBy }) => {
     const token = generateToken({
       userId: user.userId,
       walletAddress: user.walletAddress,
+      roles: user?.roles,
     });
     return { user, token, isNewUser: false };
   }

@@ -4,6 +4,6 @@ const { getAllUsers, getUserById } = require("../controllers/adminController");
 // get all users,
 router.get("/users", getAllUsers);
 // get single user by id
-router.get("/user/:id", getUserById);
+router.get("/user/:userId", getUserById);
 
 module.exports = router;

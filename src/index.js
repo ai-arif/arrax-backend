@@ -7,6 +7,7 @@ const port = process.env.PORT || 5000;
 const path = require("path");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const cors = require("cors");
 
 const morganFormat =
@@ -44,6 +45,7 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api/users", userRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

@@ -40,11 +40,68 @@ const getAllUsersService = async (
 
 // single userId will be passed, return everything about the user
 const getUserByIdService = async (userId) => {
-  const user = await User.findOne({ userId });
-  const slots = await Slot.find({ userId });
-  const subSlots = await SubSlot.find({ userId });
-  const transactions = await Transaction.find({ userId });
-  return { user, slots, subSlots, transactions };
+  try {
+    // Fetch user details
+    const user = await User.findOne({ userId });
+
+    // Fetch slots with their corresponding subslots
+    const slotsWithSubSlots = await Slot.aggregate([
+      {
+        $match: { userId: parseInt(userId) },
+      },
+      {
+        $lookup: {
+          from: "subslots",
+          localField: "subSlotIds",
+          foreignField: "_id",
+          as: "subSlots",
+        },
+      },
+      {
+        $unwind: "$subSlots",
+      },
+      {
+        $sort: {
+          slotNumber: 1,
+          "subSlots.subSlotNumber": 1,
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          userId: { $first: "$userId" },
+          slotNumber: { $first: "$slotNumber" },
+          isActive: { $first: "$isActive" },
+          sectionsCompleted: { $first: "$sectionsCompleted" },
+          price: { $first: "$price" },
+          recycleCount: { $first: "$recycleCount" },
+          recycleUserCount: { $first: "$recycleUserCount" },
+          usersCount: { $first: "$usersCount" },
+          referrals: { $first: "$referrals" },
+          generationData: { $first: "$generationData" },
+          subSlots: { $push: "$subSlots" },
+        },
+      },
+      {
+        $sort: {
+          slotNumber: 1,
+        },
+      },
+    ]);
+
+    // Fetch transactions
+    const transactions = await Transaction.find({ userId });
+
+    // Combine all data into a single response
+    return {
+      user,
+      slots: slotsWithSubSlots,
+      transactions,
+    };
+  } catch (error) {
+    console.error("Error fetching user dashboard data:", error);
+    throw new Error("Error fetching user dashboard data");
+  }
 };
 
 module.exports = { getAllUsersService, getUserByIdService };

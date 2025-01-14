@@ -9,6 +9,7 @@ const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const cors = require("cors");
+const userListener = require("./cmd/userListener");
 
 const morganFormat =
   ":method :url :status :res[content-length] - :response-time ms";
@@ -29,6 +30,8 @@ app.use(
   })
 );
 
+
+userListener()
 // Middleware
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 

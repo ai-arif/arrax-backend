@@ -13,6 +13,8 @@ async function userListener() {
     contract.on("UserRegistered", async (userAddress, userId, registrationTime, referrerAddress) => {
         console.log("userAddress", userAddress)
       try {
+
+        // add data base
         // const newUser = new User({
         //   userAddress,
         //   userId: userId.toNumber(),

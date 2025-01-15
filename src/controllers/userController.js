@@ -88,20 +88,21 @@ const getUserGenerationLevels = async (req, res) => {
       return res.status(400).json({ message: "User ID is required." });
     }
 
-    const levels = await getGenerationLevels(parseInt(userId, 10));
+    const levelsData = await getGenerationLevels(parseInt(userId, 10));
 
-    if (levels.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "User not found or no referral chain exists." });
+    if (!levelsData.length) {
+      return res.status(404).json({
+        message: "User not found or no referral chain exists.",
+      });
     }
 
-    return res.status(200).json({ levels });
+    return res.status(200).json({ levels: levelsData });
   } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ message: "An error occurred.", error: error.message });
+    console.error("Error fetching generation levels:", error);
+    return res.status(500).json({
+      message: "An error occurred while processing your request.",
+      error: error.message,
+    });
   }
 };
 

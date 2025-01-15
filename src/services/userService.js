@@ -196,30 +196,39 @@ const getUserById = async (userId) => {
 
 const getGenerationLevels = async (userId) => {
   const levels = [];
-  let currentUserId = userId;
-  let level = 1;
+  const queue = [{ userId, level: 1 }];
 
-  while (currentUserId) {
-    const user = await User.findOne({ userId: currentUserId }).lean();
-    if (!user) break;
+  while (queue.length > 0) {
+    const current = queue.shift();
+    const { userId: currentUserId, level } = current;
 
-    // Fetch referrer and exclude the current user
-    const referrer = await User.findOne({ userId: user.referredBy }).lean();
-    if (referrer) {
+    if (level > 10) break;
+
+    const users = await User.find({ referredBy: currentUserId }).lean();
+    if (users.length > 0) {
+      const activeCount = users.filter((user) => user.isActive).length;
+      const inactiveCount = users.length - activeCount;
+
       levels.push({
         level,
-        userId: referrer.userId,
-        fullName: referrer.fullName,
-        walletAddress: referrer.walletAddress,
-        income: referrer.income,
+        count: users.length,
+        active: activeCount,
+        inactive: inactiveCount,
+        users: users.map((user) => ({
+          userId: user.userId,
+          fullName: user.fullName,
+          walletAddress: user.walletAddress,
+        })),
+      });
+
+      // Add next level of users to the queue
+      users.forEach((user) => {
+        queue.push({ userId: user.userId, level: level + 1 });
       });
     }
-
-    currentUserId = user.referredBy; // Move up the referral chain
-    level++; // Increment the level
   }
 
-  return levels.sort((a, b) => a.level - b.level); // Ensure levels are sorted
+  return levels;
 };
 
 // Ensure the uploads directory exists or create it

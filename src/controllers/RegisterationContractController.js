@@ -9,7 +9,11 @@ const getContract = () => {
     const contract = new ethers.Contract(contractAddress, registrationContractABI, provider);
     return contract;
   } catch (error) {
-    throw new Error(`Failed to initialize contract: ${error.message}`);
+    return {
+      success: false,
+      message: 'Contract initialization failed',
+      error: error.message
+    };
   }
 };
 
@@ -17,9 +21,25 @@ const getUserByReferrerId = async (referrerId) => {
   try {
     const contract = getContract();
     const user = await contract.getUserByReferrerId(referrerId);
-    return user;
+    
+    if (!user || user === '0x') {
+      return {
+        success: false,
+        message: 'Referrer not found',
+        data: null
+      };
+    }
+
+    return {
+      success: true,
+      data: user
+    };
   } catch (error) {
-    throw new Error(`Failed to get user by referrer ID: ${error.message}`);
+    return {
+      success: false,
+      message: 'Referrer lookup failed',
+      error: error.message
+    };
   }
 };
 
@@ -27,9 +47,25 @@ const getUserByUserId = async (userId) => {
   try {
     const contract = getContract();
     const user = await contract.getUserByUserId(userId);
-    return user;
+    
+    if (!user || user === '0x') {
+      return {
+        success: false,
+        message: 'User ID not found',
+        data: null
+      };
+    }
+
+    return {
+      success: true,
+      data: user
+    };
   } catch (error) {
-    throw new Error(`Failed to get user by user ID: ${error.message}`);
+    return {
+      success: false,
+      message: 'User ID lookup failed',
+      error: error.message
+    };
   }
 };
 
@@ -37,9 +73,25 @@ const getUserInfo = async (userAddress) => {
   try {
     const contract = getContract();
     const user = await contract.getUserInfo(userAddress);
-    return user;
+    
+    if (!user || user === '0x') {
+      return {
+        success: false,
+        message: 'User not found',
+        data: null
+      };
+    }
+
+    return {
+      success: true,
+      data: user
+    };
   } catch (error) {
-    throw new Error(`Failed to get user info: ${error.message}`);
+    return {
+      success: false,
+      message: 'User lookup failed',
+      error: error.message
+    };
   }
 };
 
@@ -47,9 +99,25 @@ const getUserReferrals = async (userAddress) => {
   try {
     const contract = getContract();
     const referrals = await contract.getUserReferrals(userAddress);
-    return referrals;
+    
+    if (!referrals) {
+      return {
+        success: false,
+        message: 'No referrals found',
+        data: []
+      };
+    }
+
+    return {
+      success: true,
+      data: referrals
+    };
   } catch (error) {
-    throw new Error(`Failed to get user referrals: ${error.message}`);
+    return {
+      success: false,
+      message: 'Referrals lookup failed',
+      error: error.message
+    };
   }
 };
 
@@ -57,9 +125,17 @@ const getTotalUsers = async () => {
   try {
     const contract = getContract();
     const total = await contract.totalUsers();
-    return total;
+    
+    return {
+      success: true,
+      data: total
+    };
   } catch (error) {
-    throw new Error(`Failed to get total users: ${error.message}`);
+    return {
+      success: false,
+      message: 'Total users lookup failed',
+      error: error.message
+    };
   }
 };
 
@@ -67,9 +143,17 @@ const getRegistrationFee = async () => {
   try {
     const contract = getContract();
     const fee = await contract.registrationFee();
-    return fee;
+    
+    return {
+      success: true,
+      data: fee
+    };
   } catch (error) {
-    throw new Error(`Failed to get registration fee: ${error.message}`);
+    return {
+      success: false,
+      message: 'Registration fee lookup failed',
+      error: error.message
+    };
   }
 };
 
@@ -77,9 +161,25 @@ const getFeeCollector = async () => {
   try {
     const contract = getContract();
     const collector = await contract.feeCollector();
-    return collector;
+    
+    if (!collector) {
+      return {
+        success: false,
+        message: 'Fee collector not found',
+        data: null
+      };
+    }
+
+    return {
+      success: true,
+      data: collector
+    };
   } catch (error) {
-    throw new Error(`Failed to get fee collector: ${error.message}`);
+    return {
+      success: false,
+      message: 'Fee collector lookup failed',
+      error: error.message
+    };
   }
 };
 
@@ -87,9 +187,25 @@ const getPaymentToken = async () => {
   try {
     const contract = getContract();
     const token = await contract.paymentToken();
-    return token;
+    
+    if (!token) {
+      return {
+        success: false,
+        message: 'Payment token not found',
+        data: null
+      };
+    }
+
+    return {
+      success: true,
+      data: token
+    };
   } catch (error) {
-    throw new Error(`Failed to get payment token: ${error.message}`);
+    return {
+      success: false,
+      message: 'Payment token lookup failed',
+      error: error.message
+    };
   }
 };
 
@@ -97,9 +213,17 @@ const isPaused = async () => {
   try {
     const contract = getContract();
     const paused = await contract.paused();
-    return paused;
+    
+    return {
+      success: true,
+      data: paused
+    };
   } catch (error) {
-    throw new Error(`Failed to check pause status: ${error.message}`);
+    return {
+      success: false,
+      message: 'Contract pause status check failed',
+      error: error.message
+    };
   }
 };
 

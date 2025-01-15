@@ -11,6 +11,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const cors = require("cors");
 const userListener = require("./cmd/userListener");
 const { get } = require("http");
+const { getUserInfo } = require("./controllers/RegisterationContractController");
 const morganFormat =
   ":method :url :status :res[content-length] - :response-time ms";
 app.use(
@@ -54,3 +55,4 @@ app.listen(port, () => {
 });
 
 
+getUserInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd")

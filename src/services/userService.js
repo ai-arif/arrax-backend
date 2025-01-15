@@ -195,37 +195,45 @@ const getUserById = async (userId) => {
 };
 
 const getGenerationLevels = async (userId) => {
-  const levels = [];
-  const queue = [{ userId, level: 1 }];
+  const levels = Array.from({ length: 10 }, (_, i) => ({
+    level: i + 1,
+    count: 0,
+    active: 0,
+    inactive: 0,
+    users: [],
+  }));
 
-  while (queue.length > 0) {
-    const current = queue.shift();
-    const { userId: currentUserId, level } = current;
+  let currentUserIds = [userId]; // Start with the given user
+  let visitedUserIds = new Set(); // To avoid processing the same user multiple times
 
-    if (level > 10) break;
+  for (let levelIndex = 0; levelIndex < 10; levelIndex++) {
+    if (currentUserIds.length === 0) break; // Stop if there are no more users at the current level
 
-    const users = await User.find({ referredBy: currentUserId }).lean();
-    if (users.length > 0) {
-      const activeCount = users.filter((user) => user.isActive).length;
-      const inactiveCount = users.length - activeCount;
+    const referrals = await User.find({
+      referredBy: { $in: currentUserIds },
+    }).lean();
 
-      levels.push({
-        level,
-        count: users.length,
-        active: activeCount,
-        inactive: inactiveCount,
-        users: users.map((user) => ({
+    const levelData = levels[levelIndex];
+
+    for (const user of referrals) {
+      if (!visitedUserIds.has(user.userId)) {
+        visitedUserIds.add(user.userId);
+        levelData.users.push({
           userId: user.userId,
           fullName: user.fullName,
           walletAddress: user.walletAddress,
-        })),
-      });
+        });
 
-      // Add next level of users to the queue
-      users.forEach((user) => {
-        queue.push({ userId: user.userId, level: level + 1 });
-      });
+        if (user.isActive) {
+          levelData.active++;
+        } else {
+          levelData.inactive++;
+        }
+      }
     }
+
+    levelData.count = levelData.users.length;
+    currentUserIds = referrals.map((user) => user.userId); // Move to the next level
   }
 
   return levels;

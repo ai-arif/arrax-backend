@@ -24,8 +24,8 @@ async function userListener() {
       console.log("userId", userId);
       console.log("registrationTime", registrationTime);
       console.log("referrerAddress", referrerAddress);
-      const userName = contract.getUserByUserId(userId);
-      fullName = userName
+      const userName = await contract.getUserByUserId(userId);
+      fullName = userName[6]
       console.log("fullName", fullName);
       try {
         const referrer = await User.findOne({ walletAddress: referrerAddress });

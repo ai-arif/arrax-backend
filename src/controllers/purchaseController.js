@@ -1,9 +1,12 @@
 const sendResponse = require("../utils/sendResponse");
+const {
+  initializePurchaseSlotService,
+} = require("../services/purchaseService");
 
 // makePurchase
-const makePurchaseController = async (req, res) => {
+const initializePurchaseController = async (req, res) => {
   try {
-    const { userId, slotId, amount } = req.body;
+    const { slotId } = req.body;
 
     if (!userId || !slotId || !amount) {
       return sendResponse(
@@ -22,4 +25,4 @@ const makePurchaseController = async (req, res) => {
   }
 };
 
-module.exports = { makePurchaseController };
+module.exports = { initializePurchaseController };

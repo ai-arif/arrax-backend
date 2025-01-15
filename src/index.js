@@ -10,10 +10,9 @@ const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const cors = require("cors");
 const userListener = require("./cmd/userListener");
-
+const { get } = require("http");
 const morganFormat =
   ":method :url :status :res[content-length] - :response-time ms";
-
 app.use(
   morgan(morganFormat, {
     stream: {
@@ -53,3 +52,5 @@ app.use("/api/admin", adminRoutes);
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+

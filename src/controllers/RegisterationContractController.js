@@ -1,81 +1,116 @@
-import { ethers } from "ethers";
-import { registrationContractABI, contractAddress } from "../config/contractConfig.js";
-import { configDotenv } from "dotenv";
-configDotenv()
+const { ethers, JsonRpcProvider } = require("ethers");
+const { registrationContractABI, contractAddress } = require("../config/contractConfig");
+const dotenv = require("dotenv");
+dotenv.config();
 
-// Base contract connection
-export const getContract = () => {
-  const provider = new ethers.providers.JsonRpcProvider(process.env.APP_RPC);
-  const contract = new ethers.Contract(contractAddress, registrationContractABI, provider);
-  return contract;
+const getContract = () => {
+  try {
+    const provider = new JsonRpcProvider(process.env.APP_RPC);
+    const contract = new ethers.Contract(contractAddress, registrationContractABI, provider);
+    return contract;
+  } catch (error) {
+    throw new Error(`Failed to initialize contract: ${error.message}`);
+  }
 };
 
-// Get user by referrer ID
-export const getUserByReferrerId = async (referrerId) => {
-  const contract = getContract();
-  const user = await contract.getUserByReferrerId(referrerId);
-  return user;
+const getUserByReferrerId = async (referrerId) => {
+  try {
+    const contract = getContract();
+    const user = await contract.getUserByReferrerId(referrerId);
+    return user;
+  } catch (error) {
+    throw new Error(`Failed to get user by referrer ID: ${error.message}`);
+  }
 };
 
-// Get user by user ID
-export const getUserByUserId = async (userId) => {
-  const contract = getContract();
-  const user = await contract.getUserByUserId(userId);
-  return user;
+const getUserByUserId = async (userId) => {
+  try {
+    const contract = getContract();
+    const user = await contract.getUserByUserId(userId);
+    return user;
+  } catch (error) {
+    throw new Error(`Failed to get user by user ID: ${error.message}`);
+  }
 };
 
-// Get user info by address
-export const getUserInfo = async (userAddress) => {
-  const contract = getContract();
-  const user = await contract.getUserInfo(userAddress);
-  return user;
+const getUserInfo = async (userAddress) => {
+  try {
+    const contract = getContract();
+    const user = await contract.getUserInfo(userAddress);
+    return user;
+  } catch (error) {
+    throw new Error(`Failed to get user info: ${error.message}`);
+  }
 };
 
-// Get user referrals
-export const getUserReferrals = async (userAddress) => {
-  const contract = getContract();
-  const referrals = await contract.getUserReferrals(userAddress);
-  return referrals;
+const getUserReferrals = async (userAddress) => {
+  try {
+    const contract = getContract();
+    const referrals = await contract.getUserReferrals(userAddress);
+    return referrals;
+  } catch (error) {
+    throw new Error(`Failed to get user referrals: ${error.message}`);
+  }
 };
 
-// Get total users
-export const getTotalUsers = async () => {
-  const contract = getContract();
-  const total = await contract.totalUsers();
-  return total;
+const getTotalUsers = async () => {
+  try {
+    const contract = getContract();
+    const total = await contract.totalUsers();
+    return total;
+  } catch (error) {
+    throw new Error(`Failed to get total users: ${error.message}`);
+  }
 };
 
-// Get registration fee
-export const getRegistrationFee = async () => {
-  const contract = getContract();
-  const fee = await contract.registrationFee();
-  return fee;
+const getRegistrationFee = async () => {
+  try {
+    const contract = getContract();
+    const fee = await contract.registrationFee();
+    return fee;
+  } catch (error) {
+    throw new Error(`Failed to get registration fee: ${error.message}`);
+  }
 };
 
-// Register new user
-// export const registerUser = async (signer, referrerId, referrerAddress, username) => {
-//   const contract = getContract().connect(signer);
-//   const tx = await contract.registerUser(referrerId, referrerAddress, username);
-//   return tx.wait();
-// };
-
-// Get fee collector address
-export const getFeeCollector = async () => {
-  const contract = getContract();
-  const collector = await contract.feeCollector();
-  return collector;
+const getFeeCollector = async () => {
+  try {
+    const contract = getContract();
+    const collector = await contract.feeCollector();
+    return collector;
+  } catch (error) {
+    throw new Error(`Failed to get fee collector: ${error.message}`);
+  }
 };
 
-// Get payment token address
-export const getPaymentToken = async () => {
-  const contract = getContract();
-  const token = await contract.paymentToken();
-  return token;
+const getPaymentToken = async () => {
+  try {
+    const contract = getContract();
+    const token = await contract.paymentToken();
+    return token;
+  } catch (error) {
+    throw new Error(`Failed to get payment token: ${error.message}`);
+  }
 };
 
-// Check if contract is paused
-export const isPaused = async () => {
-  const contract = getContract();
-  const paused = await contract.paused();
-  return paused;
+const isPaused = async () => {
+  try {
+    const contract = getContract();
+    const paused = await contract.paused();
+    return paused;
+  } catch (error) {
+    throw new Error(`Failed to check pause status: ${error.message}`);
+  }
+};
+
+module.exports = {
+  getUserByReferrerId,
+  getUserByUserId,
+  getUserInfo,
+  getUserReferrals,
+  getTotalUsers,
+  getRegistrationFee,
+  getFeeCollector,
+  getPaymentToken,
+  isPaused,
 };

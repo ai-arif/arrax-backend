@@ -5,10 +5,12 @@ dotenv.config();
 
 const getContract = () => {
   try {
+    // console.log(contractAddress,registrationContractABI);
     const provider = new JsonRpcProvider(process.env.APP_RPC);
     const contract = new ethers.Contract(contractAddress, registrationContractABI, provider);
     return contract;
   } catch (error) {
+    console.log("Error initializing contract:", error);
     return {
       success: false,
       message: 'Contract initialization failed',
@@ -35,6 +37,7 @@ const getUserByReferrerId = async (referrerId) => {
       data: user
     };
   } catch (error) {
+    console.error('Error in getUserByReferrerId:', error);
     return {
       success: false,
       message: 'Referrer lookup failed',
@@ -61,6 +64,7 @@ const getUserByUserId = async (userId) => {
       data: user
     };
   } catch (error) {
+    console.error('Error in getUserByUserId:', error);
     return {
       success: false,
       message: 'User ID lookup failed',
@@ -71,8 +75,10 @@ const getUserByUserId = async (userId) => {
 
 const getUserInfo = async (userAddress) => {
   try {
+  
     const contract = getContract();
     const user = await contract.getUserInfo(userAddress);
+    console.log(user);
     
     if (!user || user === '0x') {
       return {
@@ -87,6 +93,7 @@ const getUserInfo = async (userAddress) => {
       data: user
     };
   } catch (error) {
+    console.error('Error in getUserInfo:', error);
     return {
       success: false,
       message: 'User lookup failed',
@@ -113,6 +120,7 @@ const getUserReferrals = async (userAddress) => {
       data: referrals
     };
   } catch (error) {
+    console.log('Error in getUserReferrals:', error);
     return {
       success: false,
       message: 'Referrals lookup failed',
@@ -131,6 +139,7 @@ const getTotalUsers = async () => {
       data: total
     };
   } catch (error) {
+    console.error('Error in getTotalUsers:', error);
     return {
       success: false,
       message: 'Total users lookup failed',
@@ -149,6 +158,7 @@ const getRegistrationFee = async () => {
       data: fee
     };
   } catch (error) {
+    console.log('Error in getRegistrationFee:', error);
     return {
       success: false,
       message: 'Registration fee lookup failed',
@@ -175,6 +185,7 @@ const getFeeCollector = async () => {
       data: collector
     };
   } catch (error) {
+    console.log('Error in getFeeCollector:', error);
     return {
       success: false,
       message: 'Fee collector lookup failed',
@@ -201,6 +212,7 @@ const getPaymentToken = async () => {
       data: token
     };
   } catch (error) {
+    console.log('Error in getPaymentToken:', error);
     return {
       success: false,
       message: 'Payment token lookup failed',
@@ -219,6 +231,7 @@ const isPaused = async () => {
       data: paused
     };
   } catch (error) {
+    console.log('Error in isPaused:', error);
     return {
       success: false,
       message: 'Contract pause status check failed',

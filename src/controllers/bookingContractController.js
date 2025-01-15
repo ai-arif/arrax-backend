@@ -245,6 +245,79 @@ const calculateUpgradeRequirements = async (userAddress) => {
     }
 };
 
+
+const getUserLevel = async (userAddress) => {
+    try {
+        const contract = getContract();
+        const level = await contract.getUserLevel(userAddress);
+        return {
+            success: true,
+            data: level.toString()
+        };
+    } catch (error) {
+        return {
+            success: false,
+            error: `Failed to get user level: ${error.message}`
+        };
+    }
+};
+
+// Get level earnings
+const getLevelEarnings = async (level) => {
+    try {
+        const contract = getContract();
+        const earnings = await contract.getLevelEarnings(level);
+        return {
+            success: true,
+            data: ethers.formatEther(earnings)
+        };
+    } catch (error) {
+        return {
+            success: false,
+            error: `Failed to get level earnings: ${error.message}`
+        };
+    }
+};
+
+// Get user slot earning
+const getUserSlotEarning = async (userAddress, slotLevel) => {
+    try {
+        const contract = getContract();
+        const earning = await contract.getUserSlotEarning(userAddress, slotLevel);
+        return {
+            success: true,
+            data: ethers.formatEther(earning)
+        };
+    } catch (error) {
+        return {
+            success: false,
+            error: `Failed to get user slot earning: ${error.message}`
+        };
+    }
+};
+
+// Get complete user stats
+const getUserStats = async (userAddress) => {
+    try {
+        const contract = getContract();
+        const stats = await contract.getUserStats(userAddress);
+        
+        return {
+            success: true,
+            data: {
+                currentLevel: stats[0].toString(),
+                slotEarnings: stats[1].map(earning => ethers.formatEther(earning)),
+                totalEarnings: ethers.formatEther(stats[2])
+            }
+        };
+    } catch (error) {
+        return {
+            success: false,
+            error: `Failed to get user stats: ${error.message}`
+        };
+    }
+};
+
 module.exports = {
     purchaseSlot,
     getSlotInfo,
@@ -255,5 +328,10 @@ module.exports = {
     getBnbFee,
     getMatrixStructure,
     isSlotActive,
-    calculateUpgradeRequirements
+    calculateUpgradeRequirements,
+    getUserLevel,
+    getLevelEarnings,
+    getUserSlotEarning,
+    getUserStats
+    
 };

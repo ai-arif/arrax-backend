@@ -30,6 +30,8 @@ const userSchema = new mongoose.Schema(
       levelIncome: { type: Number, default: 0 }, // Income from levels
       directIncome: { type: Number, default: 0 }, // Income from direct referrals
       slotIncome: { type: Number, default: 0 }, // Income from slot transactions
+      recycleIncome: { type: Number, default: 0 }, // Income from recycled slots
+      salaryIncome: { type: Number, default: 0 }, // Income from salaries
     },
   },
   { timestamps: true }

@@ -6,6 +6,10 @@ const Slot = require("../models/Slot");
 const SubSlot = require("../models/SubSlot");
 const { generateToken } = require("./tokenService");
 const getNextSequence = require("../utils/getNextSequence");
+const {
+  getUserIncome,
+  getUserStats,
+} = require("../controllers/bookingContractController");
 
 const registerOwner = async ({ walletAddress, fullName }) => {
   const existingOwner = await User.findOne({ isOwner: true });
@@ -50,6 +54,26 @@ const loginOrRegisterUser = async ({ walletAddress, fullName, referredBy }) => {
       walletAddress: user.walletAddress,
       roles: user?.roles,
     });
+    const incomeData = await getUserIncome(walletAddress);
+    const userStats = await getUserStats(walletAddress);
+    console.log("userStats", userStats);
+
+    // incomeData holds
+    // {
+    //   success: true,
+    //   data: {
+    //     directIncome: '0.0',
+    //     levelIncome: '0.0',
+    //     recycleIncome: '0.0',
+    //     salaryIncome: '0.0'
+    //   }
+    // }
+
+    user.income = {
+      ...user.income,
+      ...incomeData.data,
+    };
+    user.save();
     return { user, token, isNewUser: false };
   }
 

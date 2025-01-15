@@ -56,7 +56,6 @@ const loginOrRegisterUser = async ({ walletAddress, fullName, referredBy }) => {
     });
     const incomeData = await getUserIncome(walletAddress);
     const userStats = await getUserStats(walletAddress);
-    console.log("userStats", userStats);
 
     // incomeData holds
     // {
@@ -73,7 +72,7 @@ const loginOrRegisterUser = async ({ walletAddress, fullName, referredBy }) => {
       ...user.income,
       ...incomeData.data,
     };
-    user.save();
+    await user.save();
     return { user, token, isNewUser: false };
   }
 

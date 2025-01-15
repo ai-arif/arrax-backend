@@ -12,10 +12,7 @@ const {
 
 const print = async () => {
   console.log(
-    await getUserIncome("0x5067B66bb52864766d36BD1289a6DBC2e56B688e")
-  );
-  console.log(
-    await getSlotInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd", 2)
+    await getSlotInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd", 1)
   );
 
   //   console.log(await getTotalUsers());

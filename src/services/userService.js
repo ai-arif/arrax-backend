@@ -54,24 +54,16 @@ const loginOrRegisterUser = async ({ walletAddress, fullName, referredBy }) => {
       walletAddress: user.walletAddress,
       roles: user?.roles,
     });
+    console.log("getting user income");
     const incomeData = await getUserIncome(walletAddress);
+    console.log("getting user stats");
     const userStats = await getUserStats(walletAddress);
-
-    // incomeData holds
-    // {
-    //   success: true,
-    //   data: {
-    //     directIncome: '0.0',
-    //     levelIncome: '0.0',
-    //     recycleIncome: '0.0',
-    //     salaryIncome: '0.0'
-    //   }
-    // }
 
     user.income = {
       ...user.income,
       ...incomeData.data,
     };
+    console.log("income", user.income);
     await user.save();
     return { user, token, isNewUser: false };
   }

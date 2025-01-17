@@ -125,13 +125,13 @@ const uploadImage = async (req, res) => {
 const handleSlotWithSubSlots = async (req, res) => {
   try {
     const { userId } = req.params;
-    const slotSubSlots = await getSlotsWithSubSlots(userId);
+    const currentSlot = await getSlotsWithSubSlots(userId);
     return sendResponse(
       res,
       200,
       true,
       "Slot and sub-slots found.",
-      slotSubSlots
+      currentSlot
     );
   } catch (error) {
     return sendResponse(res, 500, false, error.message, null);

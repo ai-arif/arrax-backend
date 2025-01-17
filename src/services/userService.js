@@ -5,6 +5,7 @@ const User = require("../models/User");
 const Slot = require("../models/Slot");
 const SubSlot = require("../models/SubSlot");
 const { generateToken } = require("./tokenService");
+const { getCurrentSlot } = require("../controllers/bookingContractController");
 const getNextSequence = require("../utils/getNextSequence");
 const {
   getUserIncome,
@@ -24,17 +25,6 @@ const registerOwner = async ({ walletAddress, fullName }) => {
     roles: ["user", "admin"],
     userId: 1, // Set userId to 1 for the owner
   });
-
-  // Create slots for the owner
-  const slotPrices = Slot.slotPrices;
-  for (let i = 1; i <= 10; i++) {
-    await Slot.create({
-      userId: user.userId,
-      slotNumber: i,
-      isActive: true, // Activate only the first slot
-      price: slotPrices[i - 1], // Assign corresponding slot price
-    });
-  }
 
   const token = generateToken({
     userId: user.userId,
@@ -208,51 +198,59 @@ const processImage = async (buffer, user) => {
 
 const getSlotsWithSubSlots = async (userId) => {
   try {
-    const slotsWithSubSlots = await Slot.aggregate([
-      {
-        $match: { userId: parseInt(userId) }, // Match slots for the specific userId
-      },
-      {
-        $lookup: {
-          from: "subslots",
-          localField: "subSlotIds",
-          foreignField: "_id",
-          as: "subSlots",
-        },
-      },
-      {
-        $unwind: "$subSlots",
-      },
-      {
-        $sort: {
-          slotNumber: 1, // Sort by slotNumber
-          "subSlots.subSlotNumber": 1, // Sort subSlots by subSlotNumber
-        },
-      },
-      {
-        $group: {
-          _id: "$_id",
-          userId: { $first: "$userId" },
-          slotNumber: { $first: "$slotNumber" },
-          isActive: { $first: "$isActive" },
-          sectionsCompleted: { $first: "$sectionsCompleted" },
-          price: { $first: "$price" },
-          recycleCount: { $first: "$recycleCount" },
-          recycleUserCount: { $first: "$recycleUserCount" },
-          usersCount: { $first: "$usersCount" },
-          referrals: { $first: "$referrals" },
-          generationData: { $first: "$generationData" },
-          subSlots: { $push: "$subSlots" }, // Reassemble the sorted subSlots array
-        },
-      },
-      {
-        $sort: {
-          slotNumber: 1, // Ensure the final response is sorted by slotNumber
-        },
-      },
-    ]);
+    // const slotsWithSubSlots = await Slot.aggregate([
+    //   {
+    //     $match: { userId: parseInt(userId) },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "subslots",
+    //       localField: "subSlotIds",
+    //       foreignField: "_id",
+    //       as: "subSlots",
+    //     },
+    //   },
+    //   {
+    //     $unwind: "$subSlots",
+    //   },
+    //   {
+    //     $sort: {
+    //       slotNumber: 1, // Sort by slotNumber
+    //       "subSlots.subSlotNumber": 1, // Sort subSlots by subSlotNumber
+    //     },
+    //   },
+    //   {
+    //     $group: {
+    //       _id: "$_id",
+    //       userId: { $first: "$userId" },
+    //       slotNumber: { $first: "$slotNumber" },
+    //       isActive: { $first: "$isActive" },
+    //       sectionsCompleted: { $first: "$sectionsCompleted" },
+    //       price: { $first: "$price" },
+    //       recycleCount: { $first: "$recycleCount" },
+    //       recycleUserCount: { $first: "$recycleUserCount" },
+    //       usersCount: { $first: "$usersCount" },
+    //       referrals: { $first: "$referrals" },
+    //       generationData: { $first: "$generationData" },
+    //       subSlots: { $push: "$subSlots" }, // Reassemble the sorted subSlots array
+    //     },
+    //   },
+    //   {
+    //     $sort: {
+    //       slotNumber: 1, // Ensure the final response is sorted by slotNumber
+    //     },
+    //   },
+    // ]);
 
-    return slotsWithSubSlots;
+    // return slotsWithSubSlots;
+    const user = await User.findOne({ userId: parseInt(userId) });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const currentSlot = await getCurrentSlot(user.walletAddress);
+
+    return currentSlot;
   } catch (error) {
     console.error("Error fetching slots and subSlots:", error);
   }

@@ -37,13 +37,14 @@ const handleOwnerRegistration = async (req, res) => {
 
 const handleLoginOrRegistration = async (req, res) => {
   try {
-    const { walletAddress, fullName, referredBy } = req.body;
+    const { userId, walletAddress, fullName, referredBy } = req.body;
 
     if (!walletAddress) {
       return sendResponse(res, 400, false, "Wallet address is required.", null);
     }
 
     const result = await loginOrRegisterUser({
+      userId,
       walletAddress,
       fullName,
       referredBy,

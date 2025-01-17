@@ -21,6 +21,7 @@ const registerOwner = async ({ walletAddress, fullName }) => {
     walletAddress,
     referredBy: null, // No referrer for the owner
     isOwner: true,
+    roles: ["user", "admin"],
     userId: 1, // Set userId to 1 for the owner
   });
 
@@ -44,7 +45,20 @@ const registerOwner = async ({ walletAddress, fullName }) => {
   return { user, token };
 };
 
-const loginOrRegisterUser = async ({ walletAddress, fullName, referredBy }) => {
+// {
+//   userId: new BN(userId).toNumber(),
+//   walletAddress: userAddress,
+//   fullName,
+//   referredBy: reffererId,
+//   referrerAddress,
+// }
+const loginOrRegisterUser = async ({
+  userId,
+  walletAddress,
+  fullName,
+  referredBy,
+  referrerAddress,
+}) => {
   // Check if the user is already registered
   let user = await User.findOne({ walletAddress });
 
@@ -57,7 +71,7 @@ const loginOrRegisterUser = async ({ walletAddress, fullName, referredBy }) => {
     console.log("getting user income");
     const incomeData = await getUserIncome(walletAddress);
     console.log("getting user stats");
-    const userStats = await getUserStats(walletAddress);
+    // const userStats = await getUserStats(walletAddress);
 
     user.income = {
       ...user.income,
@@ -80,14 +94,15 @@ const loginOrRegisterUser = async ({ walletAddress, fullName, referredBy }) => {
   }
 
   // Generate a new user ID
-  const nextUserId = await getNextSequence("userId");
+  // const nextUserId = await getNextSequence("userId");
 
   // Create the new user
   user = await User.create({
-    userId: nextUserId,
+    userId,
     fullName,
     walletAddress,
     referredBy,
+    referrerAddress,
     isOwner: false,
   });
 
@@ -96,79 +111,7 @@ const loginOrRegisterUser = async ({ walletAddress, fullName, referredBy }) => {
   referrer.totalTeam += 1;
   referrer.totalPartners += 1;
 
-  // Update generation data for up to 10 levels
-  let currentReferrer = referrer;
-  for (let level = 1; level <= 10 && currentReferrer; level++) {
-    const slot = await Slot.findOne({
-      userId: currentReferrer.userId,
-      slotNumber: 1,
-    });
-    if (slot) {
-      const generation = slot.generationData.find(
-        (gen) => gen.generationLevel === level
-      );
-      if (generation) {
-        generation.count += 1;
-      } else {
-        slot.generationData.push({ generationLevel: level, count: 1 });
-      }
-      await slot.save();
-    }
-    currentReferrer = await User.findOne({
-      userId: currentReferrer.referredBy,
-    });
-  }
-
   await referrer.save();
-
-  // Create slots and sub-slots for the new user
-  const slotPrices = Slot.slotPrices;
-
-  const slots = [];
-  const subSlots = [];
-
-  for (let i = 1; i <= 10; i++) {
-    // Prepare slot data
-    const slotData = {
-      userId: user.userId,
-      slotNumber: i,
-      isActive: false, // All slots are blocked initially
-      price: slotPrices[i - 1], // Assign slot price based on slot number
-    };
-    slots.push(slotData);
-  }
-
-  // Create all slots in a single database call
-  const createdSlots = await Slot.insertMany(slots);
-
-  // Prepare sub-slot data for each created slot
-  createdSlots.forEach((slot) => {
-    for (let j = 1; j <= 12; j++) {
-      subSlots.push({
-        slotId: slot._id,
-        subSlotNumber: j,
-        isPurchased: false, // Initial state
-      });
-    }
-  });
-
-  // Create all sub-slots in a single database call
-  const createdSubSlots = await SubSlot.insertMany(subSlots);
-
-  // Map and update slot documents with their corresponding sub-slot IDs
-  await Promise.all(
-    createdSlots.map(async (slot) => {
-      const subSlotIds = createdSubSlots
-        .filter((subSlot) => subSlot.slotId.toString() === slot._id.toString())
-        .map((subSlot) => subSlot._id);
-
-      // Update the slot document with subSlotIds
-      await Slot.updateOne(
-        { _id: slot._id },
-        { $set: { subSlotIds: subSlotIds } }
-      );
-    })
-  );
 
   // Generate a token for the new user
   const token = generateToken({

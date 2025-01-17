@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema(
     image: { type: String, required: false },
     isActive: { type: Boolean, default: false }, // Set false for inactive users
     referredBy: { type: Number, required: false }, // Referral's userId
+    referrerAddress: { type: String, required: false }, // Wallet address of the referrer
     isOwner: { type: Boolean, default: false }, // Set true for the system owner
     directReferrals: { type: [Number], default: [] }, // Array of userIds directly referred by this user
     totalPartners: { type: Number, default: 0 }, // Total direct referrals
@@ -39,6 +40,6 @@ const userSchema = new mongoose.Schema(
 );
 
 // Attach auto-increment plugin for userId
-userSchema.plugin(AutoIncrement, { inc_field: "userId" });
+// userSchema.plugin(AutoIncrement, { inc_field: "userId" });
 
 module.exports = mongoose.model("User", userSchema);

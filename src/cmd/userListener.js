@@ -6,6 +6,11 @@ const rpcURL = process.env.APP_RPC;
 const provider = new JsonRpcProvider(rpcURL);
 const User = require("../models/User");
 const { loginOrRegisterUser } = require("../services/userService");
+const {
+  getUserInfo,
+} = require("../controllers/RegisterationContractController");
+
+const BN = require("bn.js");
 
 async function userListener() {
   const contract = new ethers.Contract(contractAdress, contractABI, provider);
@@ -17,28 +22,28 @@ async function userListener() {
       userAddress,
       userId,
       registrationTime,
-      referrerAddress,
+      referrerAddress
       // fullName
     ) => {
       console.log("userAddress", userAddress);
       console.log("userId", userId);
+      console.log("Normal userId", new BN(userId).toNumber());
+
       console.log("registrationTime", registrationTime);
       console.log("referrerAddress", referrerAddress);
       const userName = await contract.getUserByUserId(userId);
-      fullName = userName[6]
+      const referreInfo = await getUserInfo(referrerAddress);
+      const reffererId = new BN(referreInfo[0]).toNumber();
+
+      fullName = userName[6];
       console.log("fullName", fullName);
       try {
-        const referrer = await User.findOne({ walletAddress: referrerAddress });
-        if (!referrer) {
-          throw new Error("Invalid referrer address.");
-        }
-
-        const referredBy = referrer.userId;
-
         const { user, token, isNewUser } = await loginOrRegisterUser({
+          userId: new BN(userId).toNumber(),
           walletAddress: userAddress,
           fullName,
-          referredBy,
+          referredBy: reffererId,
+          referrerAddress,
         });
       } catch (error) {
         console.error("Error saving to MongoDB:", error);

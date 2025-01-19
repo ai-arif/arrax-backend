@@ -47,7 +47,7 @@ const getEventLogs = async (fromBlock = 0) => {
         user: event.args.user,
         level: event.args.level.toString(),
         price: ethers.formatEther(event.args.price),
-        transactionHash: event.transactionHash,
+        // transactionHash: event.transactionHash,
         blockNumber: event.blockNumber,
         timestamp: event.blockTimestamp,
       })),
@@ -55,7 +55,7 @@ const getEventLogs = async (fromBlock = 0) => {
       matrixCompletes: events[1].map((event) => ({
         user: event.args.user,
         level: event.args.level.toString(),
-        transactionHash: event.transactionHash,
+        // transactionHash: event.transactionHash,
         blockNumber: event.blockNumber,
         timestamp: event.blockTimestamp,
       })),
@@ -64,7 +64,7 @@ const getEventLogs = async (fromBlock = 0) => {
         user: event.args.user,
         level: event.args.level.toString(),
         recycleCount: event.args.recycleCount.toString(),
-        transactionHash: event.transactionHash,
+        // transactionHash: event.transactionHash,
         blockNumber: event.blockNumber,
         timestamp: event.blockTimestamp,
       })),
@@ -75,14 +75,14 @@ const getEventLogs = async (fromBlock = 0) => {
         amount: ethers.formatEther(event.args.amount),
         level: event.args.level.toString(),
         incomeType: event.args.incomeType,
-        transactionHash: event.transactionHash,
+        // transactionHash: event.transactionHash,
         blockNumber: event.blockNumber,
         timestamp: event.blockTimestamp,
       })),
 
       slotsInitialized: events[4].map((event) => ({
         user: event.args.user,
-        transactionHash: event.transactionHash,
+        // transactionHash: event.transactionHash,
         blockNumber: event.blockNumber,
         timestamp: event.blockTimestamp,
       })),
@@ -90,7 +90,7 @@ const getEventLogs = async (fromBlock = 0) => {
       emergencyWithdrawn: events[5].map((event) => ({
         token: event.args.token,
         amount: ethers.formatEther(event.args.amount),
-        transactionHash: event.transactionHash,
+        // transactionHash: event.transactionHash,
         blockNumber: event.blockNumber,
         timestamp: event.blockTimestamp,
       })),
@@ -100,7 +100,7 @@ const getEventLogs = async (fromBlock = 0) => {
         level: event.args.level.toString(),
         position: event.args.position.toString(),
         entryTime: event.args.entryTime.toString(),
-        transactionHash: event.transactionHash,
+        // transactionHash: event.transactionHash,
         blockNumber: event.blockNumber,
         timestamp: event.blockTimestamp,
       })),
@@ -127,14 +127,14 @@ const listenToEvents = () => {
       user,
       level: level.toString(),
       price: ethers.formatEther(price),
-      transactionHash: event.transactionHash,
+      // transactionHash: event.transactionHash,
     });
     console.log("inserting order info");
     await insertOrderInfo({
       user,
       level,
       price,
-      transactionHash: event.transactionHash,
+      // transactionHash: event.transactionHash,
     });
   });
 
@@ -142,7 +142,7 @@ const listenToEvents = () => {
     console.log("Matrix Complete:", {
       user,
       level: level.toString(),
-      transactionHash: event.transactionHash,
+      // transactionHash: event.transactionHash,
     });
   });
 
@@ -151,7 +151,7 @@ const listenToEvents = () => {
       user,
       level: level.toString(),
       recycleCount: recycleCount.toString(),
-      transactionHash: event.transactionHash,
+      // transactionHash: event.transactionHash,
     });
   });
 
@@ -164,7 +164,7 @@ const listenToEvents = () => {
         amount: ethers.formatEther(amount),
         level: level.toString(),
         incomeType,
-        transactionHash: event.transactionHash,
+        // transactionHash: event.transactionHash,
       });
       await insertTransaction({
         user,
@@ -172,7 +172,7 @@ const listenToEvents = () => {
         amount,
         level,
         incomeType,
-        transactionHash: event.transactionHash,
+        // transactionHash: event.transactionHash,
       });
     }
   );
@@ -185,7 +185,7 @@ const listenToEvents = () => {
         level: level.toString(),
         position: position.toString(),
         entryTime: entryTime.toString(),
-        transactionHash: event.transactionHash,
+        // transactionHash: event.transactionHash,
       });
     }
   );
@@ -193,7 +193,7 @@ const listenToEvents = () => {
   contract.on("SlotsInitialized", (user, event) => {
     console.log("Slots Initialized:", {
       user,
-      transactionHash: event.transactionHash,
+      // transactionHash: event.transactionHash,
     });
   });
 
@@ -201,7 +201,7 @@ const listenToEvents = () => {
     console.log("Emergency Withdrawal:", {
       token,
       amount: ethers.formatEther(amount),
-      transactionHash: event.transactionHash,
+      // transactionHash: event.transactionHash,
     });
   });
 };

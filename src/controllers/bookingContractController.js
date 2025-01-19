@@ -18,7 +18,7 @@ const getContract = () => {
   }
 };
 
-const getCurrentSlotInfo = async (userAddress) => {
+const getCurrentSlot = async (userAddress) => {
   try {
     const contract = getContract();
     const slotInfo = await contract.getCurrentSlotInfo(userAddress);
@@ -179,7 +179,7 @@ const autoUpgrade = async (userWallet) => {
 };
 
 module.exports = {
-  getCurrentSlotInfo,
+  getCurrentSlot,
   getUserActiveSlots,
   getUserIncome,
   getUserReferralStats,

@@ -22,7 +22,7 @@ const getCurrentSlot = async (userAddress) => {
   try {
     const contract = getContract();
     const slotInfo = await contract.getCurrentSlotInfo(userAddress);
-
+    console.log("*****",slotInfo);
     return {
       success: true,
       data: {
@@ -62,6 +62,25 @@ const getUserActiveSlots = async (userAddress) => {
     };
   }
 };
+
+const getUserSlot= async (userAddress) => {
+    try {
+      const contract = getContract();
+      const activeSlots = await contract.userSlots(userAddress);
+  
+      return {
+        success: true,
+        activeSlot: Number(activeSlots[0])
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: `Failed to get user active slots: ${error.message}`
+      };
+    }
+  };
+
+
 
 const getUserIncome = async (userAddress) => {
   try {
@@ -184,6 +203,7 @@ module.exports = {
   getUserIncome,
   getUserReferralStats,
   getMatrixInfo,
+  getUserSlot
 //   purchaseSlot,
 //   autoUpgrade
 };

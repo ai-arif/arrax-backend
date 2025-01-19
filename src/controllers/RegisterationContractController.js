@@ -2,11 +2,11 @@ const { ethers, JsonRpcProvider } = require("ethers");
 const { registrationContractABI, contractAddress } = require("../config/contractConfig");
 const dotenv = require("dotenv");
 dotenv.config();
+const provider = new JsonRpcProvider(process.env.APP_RPC);
 
 const getContract = () => {
   try {
     // console.log(contractAddress,registrationContractABI);
-    const provider = new JsonRpcProvider(process.env.APP_RPC);
     const contract = new ethers.Contract(contractAddress, registrationContractABI, provider);
     return contract;
   } catch (error) {
@@ -14,6 +14,51 @@ const getContract = () => {
     return {
       success: false,
       message: 'Contract initialization failed',
+      error: error.message
+    };
+  }
+};
+const pauseContract = async () => {
+  try {
+    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+    const contract = getContract().connect(wallet);
+    
+    const transaction = await contract.pauseContract();
+    await transaction.wait();
+
+    return {
+      success: true,
+      message: 'Contract paused successfully',
+      data: transaction
+    };
+  } catch (error) {
+    console.error('Error in pauseContract:', error);
+    return {
+      success: false,
+      message: 'Failed to pause contract',
+      error: error.message
+    };
+  }
+};
+
+const unpauseContract = async () => {
+  try {
+    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+    const contract = getContract().connect(wallet);
+    
+    const transaction = await contract.unpauseContract();
+    await transaction.wait();
+
+    return {
+      success: true,
+      message: 'Contract unpaused successfully',
+      data: transaction
+    };
+  } catch (error) {
+    console.error('Error in unpauseContract:', error);
+    return {
+      success: false,
+      message: 'Failed to unpause contract',
       error: error.message
     };
   }

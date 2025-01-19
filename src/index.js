@@ -13,6 +13,7 @@ const userListener = require("./cmd/userListener");
 const { get } = require("http");
 const { getUserInfo } = require("./controllers/RegisterationContractController");
 const { listenToEvents, getEventLogs } = require("./cmd/matrixListener");
+const { BN } = require("bn.js");
 const morganFormat =
   ":method :url :status :res[content-length] - :response-time ms";
 app.use(
@@ -59,3 +60,7 @@ app.listen(port, () => {
 // getUserInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd")
 listenToEvents()
 getEventLogs()
+
+
+// const referreInfo =  getUserInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data)=> console.log(Number(data.data[0]))) 
+

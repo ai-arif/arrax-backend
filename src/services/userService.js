@@ -49,6 +49,12 @@ const loginOrRegisterUser = async ({
   referredBy,
   referrerAddress,
 }) => {
+
+  console.log("userId",   userId,
+    walletAddress,
+    fullName,
+    referredBy,
+    referrerAddress,);
   // Check if the user is already registered
   let user = await User.findOne({ walletAddress });
 

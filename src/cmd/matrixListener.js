@@ -3,82 +3,95 @@ const { JsonRpcProvider } = require("ethers");
 const { bookingContractAddress, matrixProABI } = require("../config/contractConfig.js");
 const dotenv = require("dotenv");
 dotenv.config();
+
 const provider = new JsonRpcProvider(process.env.APP_RPC);
 const contract = new ethers.Contract(bookingContractAddress, matrixProABI, provider);
 
-
-const getEventLogs = async ( fromBlock = 0) => {
+const getEventLogs = async (fromBlock = 0) => {
     try {
         console.log("Fetching events from block:", fromBlock);
-        // Define all events to track
+        
         const eventFilters = {
             slotPurchased: contract.filters.SlotPurchased(),
-            slotRecycled: contract.filters.SlotRecycled(),
-            directBonus: contract.filters.DirectBonus(),
-            levelBonus: contract.filters.LevelBonus(),
-            salaryClaimed: contract.filters.SalaryClaimed(),
-            recycleBonus: contract.filters.RecycleBonus()
+            matrixComplete: contract.filters.MatrixComplete(),
+            recycled: contract.filters.Recycled(),
+            rewardDistributed: contract.filters.RewardDistributed(),
+            slotsInitialized: contract.filters.SlotsInitialized(),
+            emergencyWithdrawn: contract.filters.EmergencyWithdrawn(),
+            slotPositionUpdated: contract.filters.SlotPositionUpdated()
         };
 
-        // Fetch all events
         const events = await Promise.all([
             contract.queryFilter(eventFilters.slotPurchased, fromBlock),
-            contract.queryFilter(eventFilters.slotRecycled, fromBlock),
-            contract.queryFilter(eventFilters.directBonus, fromBlock),
-            contract.queryFilter(eventFilters.levelBonus, fromBlock),
-            contract.queryFilter(eventFilters.salaryClaimed, fromBlock),
-            contract.queryFilter(eventFilters.recycleBonus, fromBlock)
+            contract.queryFilter(eventFilters.matrixComplete, fromBlock),
+            contract.queryFilter(eventFilters.recycled, fromBlock),
+            contract.queryFilter(eventFilters.rewardDistributed, fromBlock),
+            contract.queryFilter(eventFilters.slotsInitialized, fromBlock),
+            contract.queryFilter(eventFilters.emergencyWithdrawn, fromBlock),
+            contract.queryFilter(eventFilters.slotPositionUpdated, fromBlock)
         ]);
 
-        // Process and format events
         const formattedEvents = {
             slotPurchases: events[0].map(event => ({
                 user: event.args.user,
                 level: event.args.level.toString(),
                 price: ethers.formatEther(event.args.price),
                 transactionHash: event.transactionHash,
-                blockNumber: event.blockNumber
+                blockNumber: event.blockNumber,
+                timestamp: event.blockTimestamp
             })),
 
-            slotRecycles: events[1].map(event => ({
+            matrixCompletes: events[1].map(event => ({
+                user: event.args.user,
+                level: event.args.level.toString(),
+                transactionHash: event.transactionHash,
+                blockNumber: event.blockNumber,
+                timestamp: event.blockTimestamp
+            })),
+
+            recycled: events[2].map(event => ({
                 user: event.args.user,
                 level: event.args.level.toString(),
                 recycleCount: event.args.recycleCount.toString(),
                 transactionHash: event.transactionHash,
-                blockNumber: event.blockNumber
+                blockNumber: event.blockNumber,
+                timestamp: event.blockTimestamp
             })),
 
-            directBonuses: events[2].map(event => ({
-                user: event.args.user,
-                from: event.args.from,
-                amount: ethers.formatEther(event.args.amount),
-                transactionHash: event.transactionHash,
-                blockNumber: event.blockNumber
-            })),
-
-            levelBonuses: events[3].map(event => ({
+            rewardDistributed: events[3].map(event => ({
                 user: event.args.user,
                 from: event.args.from,
                 amount: ethers.formatEther(event.args.amount),
                 level: event.args.level.toString(),
+                incomeType: event.args.incomeType,
                 transactionHash: event.transactionHash,
-                blockNumber: event.blockNumber
+                blockNumber: event.blockNumber,
+                timestamp: event.blockTimestamp
             })),
 
-            salaryClaims: events[4].map(event => ({
+            slotsInitialized: events[4].map(event => ({
                 user: event.args.user,
-                level: event.args.level.toString(),
-                amount: ethers.formatEther(event.args.amount),
                 transactionHash: event.transactionHash,
-                blockNumber: event.blockNumber
+                blockNumber: event.blockNumber,
+                timestamp: event.blockTimestamp
             })),
 
-            recycleBonuses: events[5].map(event => ({
-                user: event.args.user,
-                level: event.args.level.toString(),
+            emergencyWithdrawn: events[5].map(event => ({
+                token: event.args.token,
                 amount: ethers.formatEther(event.args.amount),
                 transactionHash: event.transactionHash,
-                blockNumber: event.blockNumber
+                blockNumber: event.blockNumber,
+                timestamp: event.blockTimestamp
+            })),
+
+            slotPositionUpdated: events[6].map(event => ({
+                user: event.args.user,
+                level: event.args.level.toString(),
+                position: event.args.position.toString(),
+                entryTime: event.args.entryTime.toString(),
+                transactionHash: event.transactionHash,
+                blockNumber: event.blockNumber,
+                timestamp: event.blockTimestamp
             }))
         };
 
@@ -96,8 +109,8 @@ const getEventLogs = async ( fromBlock = 0) => {
 };
 
 const listenToEvents = () => {
-    console.log("Listening for Slot events...")
-    // const contract = getContract();
+    console.log("Listening for Matrix events...");
+
     contract.on("SlotPurchased", (user, level, price, event) => {
         console.log("New Slot Purchase:", {
             user,
@@ -107,8 +120,16 @@ const listenToEvents = () => {
         });
     });
 
-    contract.on("SlotRecycled", (user, level, recycleCount, event) => {
-        console.log("Slot Recycled:", {
+    contract.on("MatrixComplete", (user, level, event) => {
+        console.log("Matrix Complete:", {
+            user,
+            level: level.toString(),
+            transactionHash: event.transactionHash
+        });
+    });
+
+    contract.on("Recycled", (user, level, recycleCount, event) => {
+        console.log("Position Recycled:", {
             user,
             level: level.toString(),
             recycleCount: recycleCount.toString(),
@@ -116,38 +137,37 @@ const listenToEvents = () => {
         });
     });
 
-    contract.on("DirectBonus", (user, from, amount, event) => {
-        console.log("Direct Bonus:", {
-            user,
-            from,
-            amount: ethers.formatEther(amount),
-            transactionHash: event.transactionHash
-        });
-    });
-
-    contract.on("LevelBonus", (user, from, amount, level, event) => {
-        console.log("Level Bonus:", {
+    contract.on("RewardDistributed", (user, from, amount, level, incomeType, event) => {
+        console.log("Reward Distributed:", {
             user,
             from,
             amount: ethers.formatEther(amount),
             level: level.toString(),
+            incomeType,
             transactionHash: event.transactionHash
         });
     });
 
-    contract.on("SalaryClaimed", (user, level, amount, event) => {
-        console.log("Salary Claimed:", {
+    contract.on("SlotPositionUpdated", (user, level, position, entryTime, event) => {
+        console.log("Slot Position Updated:", {
             user,
             level: level.toString(),
-            amount: ethers.formatEther(amount),
+            position: position.toString(),
+            entryTime: entryTime.toString(),
             transactionHash: event.transactionHash
         });
     });
 
-    contract.on("RecycleBonus", (user, level, amount, event) => {
-        console.log("Recycle Bonus:", {
+    contract.on("SlotsInitialized", (user, event) => {
+        console.log("Slots Initialized:", {
             user,
-            level: level.toString(),
+            transactionHash: event.transactionHash
+        });
+    });
+
+    contract.on("EmergencyWithdrawn", (token, amount, event) => {
+        console.log("Emergency Withdrawal:", {
+            token,
             amount: ethers.formatEther(amount),
             transactionHash: event.transactionHash
         });
@@ -159,12 +179,12 @@ const getFilteredEvents = async (contract, userAddress, fromBlock = 0) => {
         const userFilter = {
             address: contract.address,
             topics: [
-                null, // any event signature
-                ethers.utils.hexZeroPad(userAddress, 32) // user address as topic
+                null,
+                ethers.zeroPadValue(userAddress, 32)
             ]
         };
 
-        const events = await contract.provider.getLogs(userFilter);
+        const events = await provider.getLogs(userFilter);
         const decodedEvents = events.map(log => {
             try {
                 return contract.interface.parseLog(log);
@@ -180,7 +200,7 @@ const getFilteredEvents = async (contract, userAddress, fromBlock = 0) => {
     } catch (error) {
         return {
             success: false,
-            error: `Failed to get filtered events: ${error.message}`
+            error: `Failed to fetch events: ${error.message}`
         };
     }
 };

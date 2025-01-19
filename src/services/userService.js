@@ -49,73 +49,81 @@ const loginOrRegisterUser = async ({
   referredBy,
   referrerAddress,
 }) => {
+  try {
+    console.log(
+      "userId",
+      userId,
+      walletAddress,
+      fullName,
+      referredBy,
+      referrerAddress
+    );
+    let user = await User.findOne({ walletAddress });
 
-  console.log("userId",   userId,
-    walletAddress,
-    fullName,
-    referredBy,
-    referrerAddress,);
-  // Check if the user is already registered
-  let user = await User.findOne({ walletAddress });
+    if (user) {
+      const token = generateToken({
+        userId: user.userId,
+        walletAddress: user.walletAddress,
+        roles: user?.roles,
+      });
+      console.log("getting user income");
+      const incomeData = await getUserIncome(walletAddress);
+      console.log("getting user stats");
+      // const userStats = await getUserStats(walletAddress);
 
-  if (user) {
+      user.income = {
+        ...user.income,
+        ...incomeData.data,
+      };
+      console.log("income", user.income);
+      await user.save();
+      return { user, token, isNewUser: false };
+    }
+
+    // Registration logic for new users
+    if (!referredBy || !fullName) {
+      throw new Error(
+        "Full name and referral ID are required for registration."
+      );
+    }
+
+    // Validate the referral ID
+    const referrer = await User.findOne({ userId: referredBy });
+    if (!referrer) {
+      throw new Error("Invalid referral ID.");
+    }
+
+    // Generate a new user ID
+    // const nextUserId = await getNextSequence("userId");
+
+    // Create the new user
+    user = await User.create({
+      userId,
+      fullName,
+      walletAddress,
+      referredBy,
+      referrerAddress,
+      isOwner: false,
+    });
+
+    // Update the referrer's direct referrals and total team count
+    referrer.directReferrals.push(user.userId);
+    referrer.totalTeam += 1;
+    referrer.totalPartners += 1;
+
+    await referrer.save();
+
+    // Generate a token for the new user
     const token = generateToken({
       userId: user.userId,
       walletAddress: user.walletAddress,
-      roles: user?.roles,
     });
-    console.log("getting user income");
-    const incomeData = await getUserIncome(walletAddress);
-    console.log("getting user stats");
-    // const userStats = await getUserStats(walletAddress);
 
-    user.income = {
-      ...user.income,
-      ...incomeData.data,
-    };
-    console.log("income", user.income);
-    await user.save();
-    return { user, token, isNewUser: false };
+    return { user, token, isNewUser: true };
+  } catch (error) {
+    console.error("Error registering user:", error.message);
+    throw error;
   }
-
-  // Registration logic for new users
-  if (!referredBy || !fullName) {
-    throw new Error("Full name and referral ID are required for registration.");
-  }
-
-  // Validate the referral ID
-  const referrer = await User.findOne({ userId: referredBy });
-  if (!referrer) {
-    throw new Error("Invalid referral ID.");
-  }
-
-  // Generate a new user ID
-  // const nextUserId = await getNextSequence("userId");
-
-  // Create the new user
-  user = await User.create({
-    userId,
-    fullName,
-    walletAddress,
-    referredBy,
-    referrerAddress,
-    isOwner: false,
-  });
-
-  // Update the referrer's direct referrals and total team count
-  referrer.directReferrals.push(user.userId);
-  referrer.totalTeam += 1;
-  referrer.totalPartners += 1;
-
-  await referrer.save();
-
-  // Generate a token for the new user
-  const token = generateToken({
-    userId: user.userId,
-    walletAddress: user.walletAddress,
-  });
-
-  return { user, token, isNewUser: true };
 };
 
 // get user information by userId

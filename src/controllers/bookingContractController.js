@@ -181,7 +181,7 @@ const autoUpgrade = async (userWallet) => {
 module.exports = {
   getCurrentSlotInfo,
   getUserActiveSlots,
-  getUserIncomeStats,
+  getUserIncome,
   getUserReferralStats,
   getMatrixInfo,
 //   purchaseSlot,

@@ -63,7 +63,7 @@ const getUserActiveSlots = async (userAddress) => {
   }
 };
 
-const getUserIncomeStats = async (userAddress) => {
+const getUserIncome = async (userAddress) => {
   try {
     const contract = getContract();
     const income = await contract.getUserIncomeStats(userAddress);

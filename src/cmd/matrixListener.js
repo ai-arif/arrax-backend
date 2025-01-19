@@ -129,6 +129,7 @@ const listenToEvents = () => {
       price: ethers.formatEther(price),
       transactionHash: event.transactionHash,
     });
+    console.log("inserting order info");
     await insertOrderInfo({
       user,
       level,

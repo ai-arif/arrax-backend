@@ -1,12 +1,12 @@
 const { ethers, JsonRpcProvider } = require("ethers");
-const { matrixABI, contractAddress } = require("../config/contractConfig");
+const { matrixProABI, bookingContractAddress } = require("../config/contractConfig");
 const dotenv = require("dotenv");
 dotenv.config();
 
 const getContract = () => {
   try {
     const provider = new JsonRpcProvider(process.env.APP_RPC);
-    const contract = new ethers.Contract(contractAddress, matrixABI, provider);
+    const contract = new ethers.Contract(bookingContractAddress, matrixProABI, provider);
     return contract;
   } catch (error) {
     console.log("Error initializing contract:", error);

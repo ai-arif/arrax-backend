@@ -1,5 +1,12 @@
 [
 	{
+		"inputs": [],
+		"name": "autoUpgrade",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -13,19 +20,6 @@
 			}
 		],
 		"name": "emergencyWithdraw",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			}
-		],
-		"name": "initializeUserSlots",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -107,6 +101,19 @@
 		],
 		"name": "EmergencyWithdrawn",
 		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "initializeUserSlots",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"anonymous": false,

@@ -64,6 +64,27 @@ const unpauseContract = async () => {
   }
 };
 
+const getRegistrationStatus = async () => {
+  try {
+    const contract = getContract();
+    const data = await contract.paused();
+    console.log(data);
+    return {
+      success: true,
+      status: data
+    };
+  } catch (error) {
+    console.error('Error in getRegistrationStatus:', error);
+    return {
+      success: false,
+      message: 'Getting Error Status failed',
+      error: error.message
+    };
+  }
+};
+
+
+
 const getUserByReferrerId = async (referrerId) => {
   try {
     const contract = getContract();

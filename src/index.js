@@ -14,7 +14,7 @@ const { get } = require("http");
 const { getUserInfo } = require("./controllers/RegisterationContractController");
 const { listenToEvents, getEventLogs } = require("./cmd/matrixListener");
 const { BN } = require("bn.js");
-const { getCurrentSlotInfo, getCurrentSlot, getUserActiveSlots, getUserIncome, getUserSlot } = require("./controllers/bookingContractController");
+const { getCurrentSlotInfo, getCurrentSlot, getUserActiveSlots, getUserIncome, getUserSlot, getSlotData } = require("./controllers/bookingContractController");
 // const { getSlotInfo } = require("./controllers/bookingContractController");
 const morganFormat =
   ":method :url :status :res[content-length] - :response-time ms";
@@ -67,7 +67,7 @@ listenToEvents()
 // getCurrentSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data)=> console.log(data))
 getUserActiveSlots("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data)=> console.log(data))
 getUserIncome("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data)=> console.log(data))
-getCurrentSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data)=> console.log(data))
+// getCurrentSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data)=> console.log(data))
 // const referreInfo =  getUserInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data)=> console.log(Number(data.data[0]))) 
-
+getSlotData(0).then((data)=> console.log(data))
 getUserSlot("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data)=> console.log(data))

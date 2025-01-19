@@ -81,6 +81,33 @@ const getUserSlot= async (userAddress) => {
   };
 
 
+  const getSlotData= async (level) => {
+    try {
+      const contract = getContract();
+      const data = await contract.slots(level);
+     
+  console.log("getSlotData", {
+    level: data[0].toString(),
+    recycleCount: data[2],
+    transactions: data[3].toString()
+  })
+      return {
+        success: true,
+        data : {
+          level: data[0].toString(),
+          recycleCount: data[2],
+          transactions: data[3].toString()
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: `Failed to getting slots: ${error.message}`
+      };
+    }
+  };
+
+
 
 const getUserIncome = async (userAddress) => {
   try {
@@ -203,7 +230,8 @@ module.exports = {
   getUserIncome,
   getUserReferralStats,
   getMatrixInfo,
-  getUserSlot
+  getUserSlot,
+  getSlotData
 //   purchaseSlot,
 //   autoUpgrade
 };

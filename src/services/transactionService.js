@@ -10,13 +10,13 @@ const insertTransaction = async ({
   transactionHash,
 }) => {
   try {
-    const user = await User.findOne({ walletAddress: user });
-    if (!user) {
+    const userInfo = await User.findOne({ walletAddress: user });
+    if (!userInfo) {
       throw new Error("User not found");
     }
     const fromUser = await User.findOne({ walletAddress: from });
     const transaction = await Transaction.create({
-      receiverId: user?.userId,
+      receiverId: userInfo?.userId,
       receiver: user,
       from,
       fromId: fromUser?.userId,

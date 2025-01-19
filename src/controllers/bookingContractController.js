@@ -1,19 +1,12 @@
 const { ethers, JsonRpcProvider } = require("ethers");
-const {
-  matrixProABI,
-  bookingContractAddress,
-} = require("../config/contractConfig");
+const { matrixABI, contractAddress } = require("../config/contractConfig");
 const dotenv = require("dotenv");
 dotenv.config();
 
 const getContract = () => {
   try {
     const provider = new JsonRpcProvider(process.env.APP_RPC);
-    const contract = new ethers.Contract(
-      bookingContractAddress,
-      matrixProABI,
-      provider
-    );
+    const contract = new ethers.Contract(contractAddress, matrixABI, provider);
     return contract;
   } catch (error) {
     console.log("Error initializing contract:", error);
@@ -25,318 +18,172 @@ const getContract = () => {
   }
 };
 
-// const purchaseSlot = async (userWallet, slotLevel, bnbFee, tokenAmount) => {
-//     try {
-//         const contract = getContract();
-//         const signer = userWallet.connect(provider);
-//         const contractWithSigner = contract.connect(signer);
-
-//         const tx = await contractWithSigner.purchaseSlot(slotLevel, {
-//             value: ethers.parseEther(bnbFee.toString())
-//         });
-//         const receipt = await tx.wait();
-
-//         return {
-//             success: true,
-//             data: {
-//                 transactionHash: receipt.hash,
-//                 slotLevel,
-//                 cost: tokenAmount
-//             }
-//         };
-//     } catch (error) {
-//         return {
-//             success: false,
-//             error: `Slot purchase failed: ${error.message}`
-//         };
-//     }
-// };
-
-const getSlotInfo = async (userAddress, slotLevel) => {
+const getCurrentSlotInfo = async (userAddress) => {
   try {
     const contract = getContract();
-    const slotInfo = await contract.getSlotInfo(userAddress, slotLevel);
+    const slotInfo = await contract.getCurrentSlotInfo(userAddress);
 
     return {
       success: true,
       data: {
-        id: slotInfo[0].toString(),
-        position: slotInfo[1].toString(),
-        recycleCount: slotInfo[2].toString(),
-        isActive: slotInfo[3],
-        upperSlots: slotInfo[4],
-        lowerSlots: slotInfo[5],
-        earnings: ethers.formatEther(slotInfo[6]),
-      },
+        currentActiveSlot: slotInfo[0].toString(),
+        currentPosition: slotInfo[1].toString(),
+        entryTime: slotInfo[2].toString(),
+        matrixSize: slotInfo[3].toString(),
+        recycleCount: slotInfo[4].toString(),
+        timeInPosition: slotInfo[5].toString()
+      }
     };
   } catch (error) {
     return {
       success: false,
-      error: `Failed to get slot info: ${error.message}`,
+      error: `Failed to get current slot info: ${error.message}`
     };
   }
 };
 
-const getUserIncome = async (userAddress) => {
+const getUserActiveSlots = async (userAddress) => {
   try {
     const contract = getContract();
-    const income = await contract.getUserIncome(userAddress);
+    const activeSlots = await contract.getUserActiveSlots(userAddress);
 
     return {
       success: true,
       data: {
-        directIncome: ethers.formatEther(income[0]),
-        levelIncome: ethers.formatEther(income[1]),
-        recycleIncome: ethers.formatEther(income[2]),
-        salaryIncome: ethers.formatEther(income[3]),
-      },
+        slots: activeSlots[0].map(slot => slot.toString()),
+        positions: activeSlots[1].map(pos => pos.toString()),
+        entryTimes: activeSlots[2].map(time => time.toString())
+      }
     };
   } catch (error) {
     return {
       success: false,
-      error: `Failed to get user income: ${error.message}`,
+      error: `Failed to get user active slots: ${error.message}`
     };
   }
 };
 
-const getCurrentSlot = async (userAddress) => {
+const getUserIncomeStats = async (userAddress) => {
   try {
     const contract = getContract();
-    const currentSlot = await contract.currentActiveSlot(userAddress);
-    return {
-      success: true,
-      data: currentSlot.toString(),
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: `Failed to get current slot: ${error.message}`,
-    };
-  }
-};
-
-const getDirectReferrals = async (userAddress, slotLevel) => {
-  try {
-    const contract = getContract();
-    const referrals = await contract.directReferrals(userAddress, slotLevel);
-    return {
-      success: true,
-      data: referrals,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: `Failed to get direct referrals: ${error.message}`,
-    };
-  }
-};
-
-const getSlotPrice = async (level) => {
-  try {
-    const contract = getContract();
-    const price = await contract.slotPrices(level - 1);
-    return {
-      success: true,
-      data: ethers.formatEther(price),
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: `Failed to get slot price: ${error.message}`,
-    };
-  }
-};
-
-const getBnbFee = async () => {
-  try {
-    const contract = getContract();
-    const fee = await contract.bnbFee();
-    return {
-      success: true,
-      data: ethers.formatEther(fee),
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: `Failed to get BNB fee: ${error.message}`,
-    };
-  }
-};
-
-const formatMatrixPositions = async (positions) => {
-  const formattedPositions = [];
-  for (let pos of positions) {
-    if (pos !== ethers.ZeroAddress) {
-      const income = await getUserIncome(pos);
-      formattedPositions.push({
-        address: pos,
-        income: income.success ? income.data : null,
-      });
-    }
-  }
-  return formattedPositions;
-};
-
-const getMatrixStructure = async (userAddress, slotLevel) => {
-  try {
-    const slotInfo = await getSlotInfo(userAddress, slotLevel);
-    if (!slotInfo.success) throw new Error(slotInfo.error);
-
-    const structure = {
-      owner: userAddress,
-      level: slotLevel,
-      upperMatrix: await formatMatrixPositions(slotInfo.data.upperSlots),
-      lowerMatrix: await formatMatrixPositions(slotInfo.data.lowerSlots),
-    };
-
-    return {
-      success: true,
-      data: structure,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: `Failed to get matrix structure: ${error.message}`,
-    };
-  }
-};
-
-const isSlotActive = async (userAddress, slotLevel) => {
-  try {
-    const slotInfo = await getSlotInfo(userAddress, slotLevel);
-    return {
-      success: true,
-      data: slotInfo.data.isActive,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: `Failed to check slot status: ${error.message}`,
-    };
-  }
-};
-
-const calculateUpgradeRequirements = async (userAddress) => {
-  try {
-    const currentSlot = await getCurrentSlot(userAddress);
-    if (!currentSlot.success) throw new Error(currentSlot.error);
-
-    const nextLevel = parseInt(currentSlot.data) + 1;
-    if (nextLevel > 10) {
-      return {
-        success: true,
-        data: {
-          canUpgrade: false,
-          message: "Maximum level reached",
-        },
-      };
-    }
-
-    const price = await getSlotPrice(nextLevel);
-    const bnbFee = await getBnbFee();
+    const income = await contract.getUserIncomeStats(userAddress);
 
     return {
       success: true,
       data: {
-        canUpgrade: true,
-        nextLevel,
-        requiredToken: price.data,
-        requiredBnb: bnbFee.data,
-      },
+        total: ethers.formatEther(income[0]),
+        levelIncome: ethers.formatEther(income[1]), 
+        directIncome: ethers.formatEther(income[2]),
+        slotIncome: ethers.formatEther(income[3]),
+        recycleIncome: ethers.formatEther(income[4]),
+        salaryIncome: ethers.formatEther(income[5])
+      }
     };
   } catch (error) {
     return {
       success: false,
-      error: `Failed to calculate upgrade requirements: ${error.message}`,
+      error: `Failed to get income stats: ${error.message}`
     };
   }
 };
 
-const getUserLevel = async (userAddress) => {
+const getUserReferralStats = async (userAddress) => {
   try {
     const contract = getContract();
-    const level = await contract.getUserLevel(userAddress);
-    return {
-      success: true,
-      data: level.toString(),
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: `Failed to get user level: ${error.message}`,
-    };
-  }
-};
-
-// Get level earnings
-const getLevelEarnings = async (level) => {
-  try {
-    const contract = getContract();
-    const earnings = await contract.getLevelEarnings(level);
-    return {
-      success: true,
-      data: ethers.formatEther(earnings),
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: `Failed to get level earnings: ${error.message}`,
-    };
-  }
-};
-
-// Get user slot earning
-const getUserSlotEarning = async (userAddress, slotLevel) => {
-  try {
-    const contract = getContract();
-    const earning = await contract.getUserSlotEarning(userAddress, slotLevel);
-    return {
-      success: true,
-      data: ethers.formatEther(earning),
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: `Failed to get user slot earning: ${error.message}`,
-    };
-  }
-};
-
-// Get complete user stats
-const getUserStats = async (userAddress) => {
-  try {
-    const contract = getContract();
-    const stats = await contract.getUserStats(userAddress);
+    const stats = await contract.getUserReferralStats(userAddress);
 
     return {
       success: true,
       data: {
-        currentLevel: stats[0].toString(),
-        slotEarnings: stats[1].map((earning) => ethers.formatEther(earning)),
-        totalEarnings: ethers.formatEther(stats[2]),
-      },
+        totalReferrals: stats[0].toString(),
+        activeReferrals: stats[1].toString(),
+        totalMatrixEntries: stats[2].toString(),
+        activeMatrixPositions: stats[3].toString(),
+        totalRecycles: stats[4].toString()
+      }
     };
   } catch (error) {
     return {
       success: false,
-      error: `Failed to get user stats: ${error.message}`,
+      error: `Failed to get referral stats: ${error.message}`
+    };
+  }
+};
+
+const getMatrixInfo = async (level) => {
+  try {
+    const contract = getContract();
+    const info = await contract.getMatrixInfo(level);
+
+    return {
+      success: true,
+      data: {
+        currentSize: info[0].toString(),
+        currentMatrix: info[1],
+        totalTransactions: info[2].toString()
+      }
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: `Failed to get matrix info: ${error.message}`
+    };
+  }
+};
+
+const purchaseSlot = async (userWallet, level) => {
+  try {
+    const contract = getContract();
+    const signer = userWallet.connect(provider);
+    const contractWithSigner = contract.connect(signer);
+
+    const tx = await contractWithSigner.purchaseSlot(level);
+    const receipt = await tx.wait();
+
+    return {
+      success: true,
+      data: {
+        transactionHash: receipt.hash,
+        level
+      }
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: `Slot purchase failed: ${error.message}`
+    };
+  }
+};
+
+const autoUpgrade = async (userWallet) => {
+  try {
+    const contract = getContract();
+    const signer = userWallet.connect(provider);
+    const contractWithSigner = contract.connect(signer);
+
+    const tx = await contractWithSigner.autoUpgrade();
+    const receipt = await tx.wait();
+
+    return {
+      success: true,
+      data: {
+        transactionHash: receipt.hash
+      }
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: `Auto upgrade failed: ${error.message}`
     };
   }
 };
 
 module.exports = {
-  // purchaseSlot,
-  getSlotInfo,
-  getUserIncome,
-  getCurrentSlot,
-  getDirectReferrals,
-  getSlotPrice,
-  getBnbFee,
-  getMatrixStructure,
-  isSlotActive,
-  calculateUpgradeRequirements,
-  getUserLevel,
-  getLevelEarnings,
-  getUserSlotEarning,
-  getUserStats,
+  getCurrentSlotInfo,
+  getUserActiveSlots,
+  getUserIncomeStats,
+  getUserReferralStats,
+  getMatrixInfo,
+//   purchaseSlot,
+//   autoUpgrade
 };

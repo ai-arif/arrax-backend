@@ -87,9 +87,9 @@ listenToEvents();
 // getUserInfo("0x752d8836b2Bc92d8838668188CFbbD74a309F982").then((data) =>
 //   console.log(data)
 // );
-// getUserSlot("0x786a7E3DD514E644f88DBE198A327Ab1CB6D8676").then((data) =>
-//   console.log("getUserSlot", data)
-// );
-getUserStats("0x786a7E3DD514E644f88DBE198A327Ab1CB6D8676").then((data) =>
-  console.log("getUserStats", data)
+getUserSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data) =>
+  console.log("getUserSlot", data)
 );
+// getUserStats("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data) =>
+//   console.log("getUserStats", data)
+// );

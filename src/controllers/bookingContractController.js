@@ -263,6 +263,52 @@ const getUserStats = async (address) => {
 //   }
 // };
 
+const purchasePause = async () => {
+  try {
+    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+    const contract = getContract().connect(wallet);
+    
+    const transaction = await contract.pause();
+    await transaction.wait();
+
+    return {
+      success: true,
+      message: 'Contract paused successfully',
+      data: transaction
+    };
+  } catch (error) {
+    console.error('Error in pauseContract:', error);
+    return {
+      success: false,
+      message: 'Failed to pause contract',
+      error: error.message
+    };
+  }
+};
+
+const purchaseUnpause = async () => {
+  try {
+    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+    const contract = getContract().connect(wallet);
+    
+    const transaction = await contract.unpause();
+    await transaction.wait();
+
+    return {
+      success: true,
+      message: 'Contract unpaused successfully',
+      data: transaction
+    };
+  } catch (error) {
+    console.error('Error in unpauseContract:', error);
+    return {
+      success: false,
+      message: 'Failed to unpause contract',
+      error: error.message
+    };
+  }
+};
+
 module.exports = {
   getCurrentSlot,
   getUserActiveSlots,
@@ -271,7 +317,9 @@ module.exports = {
   getMatrixInfo,
   getUserSlot,
   getSlotData,
-  getUserStats
+  getUserStats,
+  purchasePause,
+  purchaseUnpause,
 //   purchaseSlot,
 //   autoUpgrade
 };

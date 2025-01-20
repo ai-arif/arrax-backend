@@ -265,8 +265,7 @@ const getUserStats = async (address) => {
 
 const purchasePause = async () => {
   try {
-    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-    const contract = getContract().connect(wallet);
+    const contract = getContract()
     
     const transaction = await contract.pause();
     await transaction.wait();
@@ -288,8 +287,8 @@ const purchasePause = async () => {
 
 const purchaseUnpause = async () => {
   try {
-    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-    const contract = getContract().connect(wallet);
+
+    const contract = getContract()
     
     const transaction = await contract.unpause();
     await transaction.wait();
@@ -309,6 +308,29 @@ const purchaseUnpause = async () => {
   }
 };
 
+const isPurchasePaused = async () => {
+    try {
+      const contract = getContract()
+      
+      const transaction = await contract.paused();
+      await transaction.wait();
+  
+      return {
+        success: true,
+        message: 'Contract Pause Status successfully',
+        data: transaction
+      };
+    } catch (error) {
+      console.error('Error in Paused Status:', error);
+      return {
+        success: false,
+        message: 'Failed to Paused Status',
+        error: error.message
+      };
+    }
+  };
+
+
 module.exports = {
   getCurrentSlot,
   getUserActiveSlots,
@@ -320,6 +342,7 @@ module.exports = {
   getUserStats,
   purchasePause,
   purchaseUnpause,
+  isPurchasePaused
 //   purchaseSlot,
 //   autoUpgrade
 };

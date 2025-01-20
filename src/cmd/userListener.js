@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { ethers, JsonRpcProvider } = require("ethers");
-const contractAdress = process.env.CONTRACT_ADDRESS;
+const contractAdress = process.env.NEXT_PUBLIC_REGISTRATION_CONTRACT_ADDRESS;
 const contractABI = require("../../ABI/registration.json");
 const rpcURL = process.env.APP_RPC;
 const provider = new JsonRpcProvider(rpcURL);

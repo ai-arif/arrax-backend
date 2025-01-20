@@ -1,6 +1,6 @@
 const dotenv = require("dotenv");
 dotenv.config();
-const  contractAddress = process.env.CONTRACT_ADDRESS;
+const  contractAddress = process.env.NEXT_PUBLIC_REGISTRATION_CONTRACT_ADDRESS;
 const matrixProABI  = require("../../ABI/MatrixPro.json");
 const bookingContractAddress  = process.env.MATRIX_CONTRACT;
 const registrationContractABI = require("../../ABI/registration.json");

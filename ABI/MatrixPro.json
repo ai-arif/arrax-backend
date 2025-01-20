@@ -274,14 +274,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "autoUpgrade",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "bscFeePercentage",
+		"name": "BSC_FEE",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -290,6 +283,13 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "autoUpgrade",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -303,24 +303,6 @@
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "token",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "emergencyWithdraw",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -463,6 +445,69 @@
 			{
 				"internalType": "uint256",
 				"name": "salaryIncome",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "level",
+				"type": "uint256"
+			}
+		],
+		"name": "getUserLevelRecycleCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "level",
+				"type": "uint256"
+			}
+		],
+		"name": "getUserLevelStatus",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "isUpgraded",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "isInMatrix",
+				"type": "bool"
+			},
+			{
+				"internalType": "uint256",
+				"name": "position",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "recycleCount",
 				"type": "uint256"
 			}
 		],
@@ -627,7 +672,7 @@
 		],
 		"name": "purchaseSlot",
 		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
@@ -727,11 +772,11 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "_newPercentage",
+				"name": "_newFee",
 				"type": "uint256"
 			}
 		],
-		"name": "updateBscFeePercentage",
+		"name": "updateBscFee",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"

@@ -110,7 +110,7 @@ const getSettingsStatus = async () => {
   try {
     const isRegistrationPaused = await isPaused();
     return {
-      isRegistrationPaused,
+      isRegistrationPaused: isRegistrationPaused.data,
     };
   } catch (error) {
     console.error("Error fetching settings:", error);

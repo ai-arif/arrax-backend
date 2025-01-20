@@ -318,4 +318,7 @@ module.exports = {
   getFeeCollector,
   getPaymentToken,
   isPaused,
+  pauseContract,
+  unpauseContract
+
 };

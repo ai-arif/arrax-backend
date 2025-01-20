@@ -3,7 +3,7 @@
 		"inputs": [],
 		"name": "autoUpgrade",
 		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{

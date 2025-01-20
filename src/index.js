@@ -11,10 +11,19 @@ const adminRoutes = require("./routes/adminRoutes");
 const cors = require("cors");
 const userListener = require("./cmd/userListener");
 const { get } = require("http");
-const { getUserInfo } = require("./controllers/RegisterationContractController");
+const {
+  getUserInfo,
+} = require("./controllers/RegisterationContractController");
 const { listenToEvents, getEventLogs } = require("./cmd/matrixListener");
 const { BN } = require("bn.js");
-const { getCurrentSlotInfo, getCurrentSlot, getUserActiveSlots, getUserIncome, getUserSlot, getSlotData } = require("./controllers/bookingContractController");
+const {
+  getCurrentSlotInfo,
+  getCurrentSlot,
+  getUserActiveSlots,
+  getUserIncome,
+  getUserSlot,
+  getSlotData,
+} = require("./controllers/bookingContractController");
 // const { getSlotInfo } = require("./controllers/bookingContractController");
 const morganFormat =
   ":method :url :status :res[content-length] - :response-time ms";
@@ -34,8 +43,7 @@ app.use(
   })
 );
 
-
-userListener()
+userListener();
 // Middleware
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -58,16 +66,21 @@ app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 
-
 // getUserInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd")
-listenToEvents()
+listenToEvents();
 // getEventLogs()
 
 // getSlotInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd")
 // getCurrentSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data)=> console.log(data))
-getUserActiveSlots("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data)=> console.log(data))
-getUserIncome("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data)=> console.log(data))
+// getUserActiveSlots("0xa26934981D50287F62FDbEf54Ae84c815B3E4dd0").then((data) =>
+//   console.log("getUserActiveSlots", data)
+// );
+// getUserIncome("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data) =>
+//   console.log(data)
+// );
 // getCurrentSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data)=> console.log(data))
-// const referreInfo =  getUserInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data)=> console.log(Number(data.data[0]))) 
-getSlotData(0).then((data)=> console.log(data))
-getUserSlot("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data)=> console.log(data))
+// const referreInfo =  getUserInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data)=> console.log(Number(data.data[0])))
+// getSlotData(0).then((data) => console.log(data));
+getUserSlot("0x42bCcAdd3F48DC26EA986a98A2A6e070c2F26b4a").then((data) =>
+  console.log("getUserSlot", data)
+);

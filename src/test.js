@@ -10,22 +10,15 @@ const {
   getSlotInfo,
   getUserIncome,
   getCurrentSlot,
+  getUserSlot,
+  getSlotData
 } = require("./controllers/bookingContractController");
 const { loginOrRegisterUser } = require("./services/userService");
 
-const print = async () => {
-  await connectDB();
-  const { user, token, isNewUser } = await loginOrRegisterUser({
-    userId: 2,
-    walletAddress: "0xbdC963b0750dBD0F57f6825061646e7F994C08d8",
-    fullName: "Md. Mainul Hasan",
-    referredBy: 1,
-    referrerAddress: "0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd",
-  });
 
-  console.log(user);
-  console.log(token);
-  console.log(isNewUser);
+const print = async () => {
+  console.log(await getUserSlot("0x662058d2d6b489ec3F9fcA34F40d14023F8E9b9b"));
+  console.log(await getSlotData(0));
 };
 
 print();

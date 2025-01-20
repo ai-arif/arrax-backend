@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Slot = require("../models/Slot");
 const SubSlot = require("../models/SubSlot");
 const Transaction = require("../models/Transaction");
+const { isPaused } = require("../controllers/RegisterationContractController");
 // take walletAddress and fullName also page and limit
 const getAllUsersService = async (
   walletAddress,
@@ -104,4 +105,17 @@ const getUserByIdService = async (userId) => {
   }
 };
 
-module.exports = { getAllUsersService, getUserByIdService };
+//
+const getSettingsStatus = async () => {
+  try {
+    const isRegistrationPaused = await isPaused();
+    return {
+      isRegistrationPaused,
+    };
+  } catch (error) {
+    console.error("Error fetching settings:", error);
+    throw new Error("Error fetching settings");
+  }
+};
+
+module.exports = { getAllUsersService, getUserByIdService, getSettingsStatus };

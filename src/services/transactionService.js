@@ -1,3 +1,4 @@
+const { getUserIncome } = require("../controllers/bookingContractController");
 const Transaction = require("../models/Transaction");
 const User = require("../models/User");
 
@@ -25,6 +26,18 @@ const insertTransaction = async ({
       incomeType,
       transactionHash,
     });
+    const receiverIncome = await getUserIncome(userInfo?.walletAddress);
+    const fromIncome = await getUserIncome(fromUser?.walletAddress);
+    userInfo.income = {
+      ...userInfo.income,
+      ...receiverIncome.data,
+    };
+    await userInfo.save();
+    fromUser.income = {
+      ...fromUser.income,
+      ...fromIncome.data,
+    };
+    await fromUser.save();
     return transaction;
   } catch (error) {
     console.error("Error inserting transaction:", error);

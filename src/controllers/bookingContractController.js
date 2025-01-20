@@ -1,12 +1,19 @@
 const { ethers, JsonRpcProvider } = require("ethers");
-const { matrixProABI, bookingContractAddress } = require("../config/contractConfig");
+const {
+  matrixProABI,
+  bookingContractAddress,
+} = require("../config/contractConfig");
 const dotenv = require("dotenv");
 dotenv.config();
 
 const getContract = () => {
   try {
     const provider = new JsonRpcProvider(process.env.APP_RPC);
-    const contract = new ethers.Contract(bookingContractAddress, matrixProABI, provider);
+    const contract = new ethers.Contract(
+      bookingContractAddress,
+      matrixProABI,
+      provider
+    );
     return contract;
   } catch (error) {
     console.log("Error initializing contract:", error);
@@ -22,13 +29,13 @@ const getCurrentSlot = async (userAddress) => {
   try {
     const contract = getContract();
     const slotInfo = await contract.getCurrentSlotInfo(userAddress);
-    console.log("getCurrentSlot",{
+    console.log("getCurrentSlot", {
       currentActiveSlot: slotInfo[0].toString(),
       currentPosition: slotInfo[1].toString(),
       entryTime: slotInfo[2].toString(),
       matrixSize: slotInfo[3].toString(),
       recycleCount: slotInfo[4].toString(),
-      timeInPosition: slotInfo[5].toString()
+      timeInPosition: slotInfo[5].toString(),
     });
     return {
       success: true,
@@ -38,13 +45,13 @@ const getCurrentSlot = async (userAddress) => {
         entryTime: slotInfo[2].toString(),
         matrixSize: slotInfo[3].toString(),
         recycleCount: slotInfo[4].toString(),
-        timeInPosition: slotInfo[5].toString()
-      }
+        timeInPosition: slotInfo[5].toString(),
+      },
     };
   } catch (error) {
     return {
       success: false,
-      error: `Failed to get current slot info: ${error.message}`
+      error: `Failed to get current slot info: ${error.message}`,
     };
   }
 };
@@ -57,64 +64,61 @@ const getUserActiveSlots = async (userAddress) => {
     return {
       success: true,
       data: {
-        slots: activeSlots[0].map(slot => slot.toString()),
-        positions: activeSlots[1].map(pos => pos.toString()),
-        entryTimes: activeSlots[2].map(time => time.toString())
-      }
+        slots: activeSlots[0].map((slot) => slot.toString()),
+        positions: activeSlots[1].map((pos) => pos.toString()),
+        entryTimes: activeSlots[2].map((time) => time.toString()),
+      },
     };
   } catch (error) {
     return {
       success: false,
-      error: `Failed to get user active slots: ${error.message}`
+      error: `Failed to get user active slots: ${error.message}`,
     };
   }
 };
 
-const getUserSlot= async (userAddress) => {
-    try {
-      const contract = getContract();
-      const activeSlots = await contract.userSlots(userAddress);
-  
-      return {
-        success: true,
-        activeSlot: Number(activeSlots[0])
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: `Failed to get user active slots: ${error.message}`
-      };
-    }
-  };
+const getUserSlot = async (userAddress) => {
+  try {
+    const contract = getContract();
+    const activeSlots = await contract.userSlots(userAddress);
 
+    return {
+      success: true,
+      activeSlot: Number(activeSlots[0]),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: `Failed to get user active slots: ${error.message}`,
+    };
+  }
+};
 
-  const getSlotData= async (level) => {
-    try {
-      const contract = getContract();
-      const data = await contract.slots(level);
-     
-  console.log("getSlotData", {
-    level: data[0].toString(),
-    recycleCount: data[2],
-    transactions: data[3].toString()
-  })
-      return {
-        success: true,
-        data : {
-          level: data[0].toString(),
-          recycleCount: data[2],
-          transactions: data[3].toString()
-        }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: `Failed to getting slots: ${error.message}`
-      };
-    }
-  };
+const getSlotData = async (level) => {
+  try {
+    const contract = getContract();
+    const data = await contract.slots(level);
 
-
+    console.log("getSlotData", {
+      level: data[0].toString(),
+      recycleCount: data[2],
+      transactions: data[3].toString(),
+    });
+    return {
+      success: true,
+      data: {
+        level: data[0].toString(),
+        recycleCount: data[2],
+        transactions: data[3].toString(),
+      },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: `Failed to getting slots: ${error.message}`,
+    };
+  }
+};
 
 const getUserIncome = async (userAddress) => {
   try {
@@ -125,17 +129,17 @@ const getUserIncome = async (userAddress) => {
       success: true,
       data: {
         total: ethers.formatEther(income[0]),
-        levelIncome: ethers.formatEther(income[1]), 
+        levelIncome: ethers.formatEther(income[1]),
         directIncome: ethers.formatEther(income[2]),
         slotIncome: ethers.formatEther(income[3]),
         recycleIncome: ethers.formatEther(income[4]),
-        salaryIncome: ethers.formatEther(income[5])
-      }
+        salaryIncome: ethers.formatEther(income[5]),
+      },
     };
   } catch (error) {
     return {
       success: false,
-      error: `Failed to get income stats: ${error.message}`
+      error: `Failed to get income stats: ${error.message}`,
     };
   }
 };
@@ -152,13 +156,13 @@ const getUserReferralStats = async (userAddress) => {
         activeReferrals: stats[1].toString(),
         totalMatrixEntries: stats[2].toString(),
         activeMatrixPositions: stats[3].toString(),
-        totalRecycles: stats[4].toString()
-      }
+        totalRecycles: stats[4].toString(),
+      },
     };
   } catch (error) {
     return {
       success: false,
-      error: `Failed to get referral stats: ${error.message}`
+      error: `Failed to get referral stats: ${error.message}`,
     };
   }
 };
@@ -167,19 +171,19 @@ const getMatrixInfo = async (level) => {
   try {
     const contract = getContract();
     const info = await contract.getMatrixInfo(level);
-    console.log("getMatrixInfo", info)
+    console.log("getMatrixInfo", info);
     return {
       success: true,
       data: {
         currentSize: info[0].toString(),
         currentMatrix: info[1],
-        totalTransactions: info[2].toString()
-      }
+        totalTransactions: info[2].toString(),
+      },
     };
   } catch (error) {
     return {
       success: false,
-      error: `Failed to get matrix info: ${error.message}`
+      error: `Failed to get matrix info: ${error.message}`,
     };
   }
 };
@@ -194,7 +198,7 @@ const getUserStats = async (address) => {
     //   totalMatrixEntries: info[2].toString(),
     //   activeMatrixPositions: info[3].toString(),
     //   totalRecycles: info[4].toString(),
-     
+
     // })
 
     return {
@@ -205,13 +209,12 @@ const getUserStats = async (address) => {
         totalMatrixEntries: info[2].toString(),
         activeMatrixPositions: info[3].toString(),
         totalRecycles: info[4].toString(),
-       
-      }
+      },
     };
   } catch (error) {
     return {
       success: false,
-      error: `Failed to get matrix info: ${error.message}`
+      error: `Failed to get matrix info: ${error.message}`,
     };
   }
 };
@@ -265,99 +268,95 @@ const getUserStats = async (address) => {
 
 const purchasePause = async () => {
   try {
-    const contract = getContract()
-    
+    const contract = getContract();
+
     const transaction = await contract.pause();
     await transaction.wait();
 
     return {
       success: true,
-      message: 'Contract paused successfully',
-      data: transaction
+      message: "Contract paused successfully",
+      data: transaction,
     };
   } catch (error) {
-    console.error('Error in pauseContract:', error);
+    console.error("Error in pauseContract:", error);
     return {
       success: false,
-      message: 'Failed to pause contract',
-      error: error.message
+      message: "Failed to pause contract",
+      error: error.message,
     };
   }
 };
 
 const purchaseUnpause = async () => {
   try {
+    const contract = getContract();
 
-    const contract = getContract()
-    
     const transaction = await contract.unpause();
     await transaction.wait();
 
     return {
       success: true,
-      message: 'Contract unpaused successfully',
-      data: transaction
+      message: "Contract unpaused successfully",
+      data: transaction,
     };
   } catch (error) {
-    console.error('Error in unpauseContract:', error);
+    console.error("Error in unpauseContract:", error);
     return {
       success: false,
-      message: 'Failed to unpause contract',
-      error: error.message
+      message: "Failed to unpause contract",
+      error: error.message,
     };
   }
 };
 
 const isPurchasePaused = async () => {
-    try {
-      const contract = getContract()
-      
-      const transaction = await contract.paused();
-      await transaction.wait();
-  
-      return {
-        success: true,
-        message: 'Contract Pause Status successfully',
-        data: transaction
-      };
-    } catch (error) {
-      console.error('Error in Paused Status:', error);
-      return {
-        success: false,
-        message: 'Failed to Paused Status',
-        error: error.message
-      };
-    }
-  };
+  try {
+    const contract = getContract();
 
-  const getLevelReferralDetails = async (userAddress, level) => {
-    try {
-      const contract = getContract();
-      
-      const details = await contract.getLevelReferralDetails(userAddress, level);
-  
-      return {
-        success: true,
-        message: 'Level referral details fetched successfully',
-        data: {
-          referralCount: details[0],
-          recycleCount: details[1], 
-          slotTransactions: details[2],
-          isUpgraded: details[3],
-          isActive: details[4]
-        }
-      };
-    } catch (error) {
-      console.error('Error fetching level referral details:', error);
-      return {
-        success: false,
-        message: 'Failed to fetch level referral details',
-        error: error.message
-      };
-    }
-  };
-  
+    const transaction = await contract.paused();
 
+    return {
+      success: true,
+      message: "Contract Pause Status successfully",
+      data: transaction,
+    };
+  } catch (error) {
+    console.error("Error in Paused Status:", error);
+    return {
+      success: false,
+      message: "Failed to Paused Status",
+      error: error.message,
+    };
+  }
+};
+
+const getLevelReferralDetails = async (userAddress, level) => {
+  try {
+    const contract = getContract();
+
+    const details = await contract.getLevelReferralDetails(userAddress, level);
+
+    return {
+      success: true,
+      message: "Level referral details fetched successfully",
+      data: {
+        referralCount: details[0],
+        recycleCount: details[1],
+        slotTransactions: details[2],
+        isUpgraded: details[3],
+        isActive: details[4],
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching level referral details:", error);
+    return {
+      success: false,
+      message: "Failed to fetch level referral details",
+      error: error.message,
+    };
+  }
+};
 
 module.exports = {
   getCurrentSlot,
@@ -371,7 +370,7 @@ module.exports = {
   purchasePause,
   purchaseUnpause,
   isPurchasePaused,
-  getLevelReferralDetails
-//   purchaseSlot,
-//   autoUpgrade
+  getLevelReferralDetails,
+  //   purchaseSlot,
+  //   autoUpgrade
 };

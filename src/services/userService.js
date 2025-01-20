@@ -219,6 +219,8 @@ const getSlotsWithSubSlots = async (userId) => {
     }
     console.log("getting slot for ", user?.walletAddress);
     const currentSlot = await getUserSlot(user.walletAddress);
+    console.log(currentSlot);
+    console.log(await getLevelReferralDetails(user?.walletAddress,currentSlot.data))
 
     return currentSlot;
   } catch (error) {

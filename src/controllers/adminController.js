@@ -3,6 +3,8 @@ const {
   getAllUsersService,
   getUserByIdService,
   getSettingsStatus,
+  updateRegistrationStatus,
+  updatePurchasingStatus,
 } = require("../services/adminService");
 
 const getAllUsers = async (req, res) => {
@@ -40,4 +42,29 @@ const getSettings = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, getUserById, getSettings };
+const updateRegistration = async (req, res) => {
+  try {
+    const { registration } = req.body;
+    const result = await updateRegistrationStatus(registration);
+    return sendResponse(res, 200, true, "Registration status updated.", result);
+  } catch (error) {
+    return sendResponse(res, 500, false, error.message, null);
+  }
+};
+const updatePurchasing = async (req, res) => {
+  try {
+    const { purchasing } = req.body;
+    const result = await updatePurchasingStatus(purchasing);
+    return sendResponse(res, 200, true, "Purchasing status updated.", result);
+  } catch (error) {
+    return sendResponse(res, 500, false, error.message, null);
+  }
+};
+
+module.exports = {
+  getAllUsers,
+  getUserById,
+  getSettings,
+  updateRegistration,
+  updatePurchasing,
+};

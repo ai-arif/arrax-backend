@@ -84,6 +84,6 @@ listenToEvents();
 getUserInfo("0x752d8836b2Bc92d8838668188CFbbD74a309F982").then((data) =>
   console.log(data)
 );
-getUserSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data) =>
+getUserSlot("0x0cD3d729Adb930B736Dad1DDd7C4FdF692e0dd0B").then((data) =>
   console.log("getUserSlot", data)
 );

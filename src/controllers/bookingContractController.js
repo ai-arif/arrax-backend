@@ -268,10 +268,10 @@ const getUserStats = async (address) => {
 
 const purchasePause = async () => {
   try {
-    const contract = getContract();
-
+    // const contract = getContract();
+    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+    const contract = getContract().connect(wallet);
     const transaction = await contract.pause();
-    await transaction.wait();
 
     return {
       success: true,
@@ -290,8 +290,9 @@ const purchasePause = async () => {
 
 const purchaseUnpause = async () => {
   try {
-    const contract = getContract();
-
+    // const contract = getContract()
+    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+    const contract = getContract().connect(wallet);
     const transaction = await contract.unpause();
     await transaction.wait();
 
@@ -310,11 +311,37 @@ const purchaseUnpause = async () => {
   }
 };
 
+const changeSlotFees = async (feesAmount) => {
+  try {
+    // const contract = getContract();
+    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+    const contract = getContract().connect(wallet);
+    const fees = feesAmount * 10 ** 18;
+    console.log("fees", fees);
+    const transaction = await contract.updateBscFeeWallet(fees);
+    await transaction.wait();
+
+    return {
+      success: true,
+      message: "Fees Changed successfully",
+      data: transaction,
+    };
+  } catch (error) {
+    console.error("Error in Fees Updation", error);
+    return {
+      success: false,
+      message: "failed fees update",
+      error: error.message,
+    };
+  }
+};
+
 const isPurchasePaused = async () => {
   try {
     const contract = getContract();
 
     const transaction = await contract.paused();
+    await transaction.wait();
 
     return {
       success: true,
@@ -371,6 +398,7 @@ module.exports = {
   purchaseUnpause,
   isPurchasePaused,
   getLevelReferralDetails,
+  changeSlotFees,
   //   purchaseSlot,
   //   autoUpgrade
 };

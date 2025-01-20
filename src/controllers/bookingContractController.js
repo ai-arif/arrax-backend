@@ -330,6 +330,34 @@ const isPurchasePaused = async () => {
     }
   };
 
+  const getLevelReferralDetails = async (userAddress, level) => {
+    try {
+      const contract = getContract();
+      
+      const details = await contract.getLevelReferralDetails(userAddress, level);
+  
+      return {
+        success: true,
+        message: 'Level referral details fetched successfully',
+        data: {
+          referralCount: details[0],
+          recycleCount: details[1], 
+          slotTransactions: details[2],
+          isUpgraded: details[3],
+          isActive: details[4]
+        }
+      };
+    } catch (error) {
+      console.error('Error fetching level referral details:', error);
+      return {
+        success: false,
+        message: 'Failed to fetch level referral details',
+        error: error.message
+      };
+    }
+  };
+  
+
 
 module.exports = {
   getCurrentSlot,
@@ -342,7 +370,8 @@ module.exports = {
   getUserStats,
   purchasePause,
   purchaseUnpause,
-  isPurchasePaused
+  isPurchasePaused,
+  getLevelReferralDetails
 //   purchaseSlot,
 //   autoUpgrade
 };

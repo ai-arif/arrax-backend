@@ -188,14 +188,14 @@ const getUserStats = async (address) => {
   try {
     const contract = getContract();
     const info = await contract.userStats(address);
-    console.log("getUserStats", {
-      totalReferrals: info[0].toString(),
-      activeReferrals: info[1],
-      totalMatrixEntries: info[2].toString(),
-      activeMatrixPositions: info[3].toString(),
-      totalRecycles: info[4].toString(),
+    // console.log("getUserStats", {
+    //   totalReferrals: info[0].toString(),
+    //   activeReferrals: info[1],
+    //   totalMatrixEntries: info[2].toString(),
+    //   activeMatrixPositions: info[3].toString(),
+    //   totalRecycles: info[4].toString(),
      
-    })
+    // })
 
     return {
       success: true,

@@ -2,6 +2,7 @@ const sendResponse = require("../utils/sendResponse");
 const {
   getAllUsersService,
   getUserByIdService,
+  getSettingsStatus,
 } = require("../services/adminService");
 
 const getAllUsers = async (req, res) => {
@@ -30,4 +31,13 @@ const getUserById = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, getUserById };
+const getSettings = async (req, res) => {
+  try {
+    const result = await getSettingsStatus();
+    return sendResponse(res, 200, true, "Settings found.", result);
+  } catch (error) {
+    return sendResponse(res, 500, false, error.message, null);
+  }
+};
+
+module.exports = { getAllUsers, getUserById, getSettings };

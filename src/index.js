@@ -92,7 +92,7 @@ listenToEvents();
 //   console.log("getUserSlot", data)
 // );
 
-getLevelReferralDetails("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd",1).then(
+getLevelReferralDetails("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd",2).then(
   (data) => console.log("getUserStats", data)
 );
 // getUserStats("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data) =>

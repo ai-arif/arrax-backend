@@ -22,7 +22,14 @@ const getCurrentSlot = async (userAddress) => {
   try {
     const contract = getContract();
     const slotInfo = await contract.getCurrentSlotInfo(userAddress);
-    console.log("*****",slotInfo);
+    console.log("getCurrentSlot",{
+      currentActiveSlot: slotInfo[0].toString(),
+      currentPosition: slotInfo[1].toString(),
+      entryTime: slotInfo[2].toString(),
+      matrixSize: slotInfo[3].toString(),
+      recycleCount: slotInfo[4].toString(),
+      timeInPosition: slotInfo[5].toString()
+    });
     return {
       success: true,
       data: {
@@ -160,7 +167,7 @@ const getMatrixInfo = async (level) => {
   try {
     const contract = getContract();
     const info = await contract.getMatrixInfo(level);
-
+    console.log("getMatrixInfo", info)
     return {
       success: true,
       data: {
@@ -177,52 +184,84 @@ const getMatrixInfo = async (level) => {
   }
 };
 
-const purchaseSlot = async (userWallet, level) => {
+const getUserStats = async (address) => {
   try {
     const contract = getContract();
-    const signer = userWallet.connect(provider);
-    const contractWithSigner = contract.connect(signer);
-
-    const tx = await contractWithSigner.purchaseSlot(level);
-    const receipt = await tx.wait();
+    const info = await contract.userStats(address);
+    console.log("getUserStats", {
+      totalReferrals: info[0].toString(),
+      activeReferrals: info[1],
+      totalMatrixEntries: info[2].toString(),
+      activeMatrixPositions: info[3].toString(),
+      totalRecycles: info[4].toString(),
+     
+    })
 
     return {
       success: true,
       data: {
-        transactionHash: receipt.hash,
-        level
+        totalReferrals: info[0].toString(),
+        activeReferrals: info[1],
+        totalMatrixEntries: info[2].toString(),
+        activeMatrixPositions: info[3].toString(),
+        totalRecycles: info[4].toString(),
+       
       }
     };
   } catch (error) {
     return {
       success: false,
-      error: `Slot purchase failed: ${error.message}`
+      error: `Failed to get matrix info: ${error.message}`
     };
   }
 };
 
-const autoUpgrade = async (userWallet) => {
-  try {
-    const contract = getContract();
-    const signer = userWallet.connect(provider);
-    const contractWithSigner = contract.connect(signer);
+// const purchaseSlot = async (userWallet, level) => {
+//   try {
+//     const contract = getContract();
+//     const signer = userWallet.connect(provider);
+//     const contractWithSigner = contract.connect(signer);
 
-    const tx = await contractWithSigner.autoUpgrade();
-    const receipt = await tx.wait();
+//     const tx = await contractWithSigner.purchaseSlot(level);
+//     const receipt = await tx.wait();
 
-    return {
-      success: true,
-      data: {
-        transactionHash: receipt.hash
-      }
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: `Auto upgrade failed: ${error.message}`
-    };
-  }
-};
+//     return {
+//       success: true,
+//       data: {
+//         transactionHash: receipt.hash,
+//         level
+//       }
+//     };
+//   } catch (error) {
+//     return {
+//       success: false,
+//       error: `Slot purchase failed: ${error.message}`
+//     };
+//   }
+// };
+
+// const autoUpgrade = async (userWallet) => {
+//   try {
+//     const contract = getContract();
+//     const signer = userWallet.connect(provider);
+//     const contractWithSigner = contract.connect(signer);
+
+//     const tx = await contractWithSigner.autoUpgrade();
+//     const receipt = await tx.wait();
+
+//     return {
+//       success: true,
+//       data: {
+//         transactionHash: receipt.hash
+//       }
+//     };
+//   } catch (error) {
+//     return {
+//       success: false,
+//       error: `Auto upgrade failed: ${error.message}`
+//     };
+//   }
+// };
 
 module.exports = {
   getCurrentSlot,
@@ -231,7 +270,8 @@ module.exports = {
   getUserReferralStats,
   getMatrixInfo,
   getUserSlot,
-  getSlotData
+  getSlotData,
+  getUserStats
 //   purchaseSlot,
 //   autoUpgrade
 };

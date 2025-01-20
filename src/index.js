@@ -23,6 +23,9 @@ const {
   getUserIncome,
   getUserSlot,
   getSlotData,
+  getUserReferralStats,
+  getMatrixInfo,
+  getUserStats,
 } = require("./controllers/bookingContractController");
 // const { getSlotInfo } = require("./controllers/bookingContractController");
 const morganFormat =
@@ -71,19 +74,23 @@ listenToEvents();
 // getEventLogs()
 
 // getSlotInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd")
-// getCurrentSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data)=> console.log(data))
-// getUserActiveSlots("0xa26934981D50287F62FDbEf54Ae84c815B3E4dd0").then((data) =>
+// getCurrentSlot("0x786a7E3DD514E644f88DBE198A327Ab1CB6D8676").then((data)=> console.log(data))
+// getUserActiveSlots("0x786a7E3DD514E644f88DBE198A327Ab1CB6D8676").then((data) =>
 //   console.log("getUserActiveSlots", data)
 // );
-// getUserIncome("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data) =>
+// getUserIncome("0x786a7E3DD514E644f88DBE198A327Ab1CB6D8676").then((data) =>
 //   console.log(data)
 // );
-// getCurrentSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data)=> console.log(data))
-// const referreInfo =  getUserInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data)=> console.log(Number(data.data[0])))
-// getSlotData(0).then((data) => console.log(data));
-getUserInfo("0x752d8836b2Bc92d8838668188CFbbD74a309F982").then((data) =>
-  console.log(data)
+// // getCurrentSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data)=> console.log(data))
+// const referreInfo =  getUserInfo("0x752d8836b2Bc92d8838668188CFbbD74a309F982").then((data)=> console.log(Number(data.data[0])))
+// // getSlotData(0).then((data) => console.log(data));
+// getUserInfo("0x752d8836b2Bc92d8838668188CFbbD74a309F982").then((data) =>
+//   console.log(data)
+// );
+// getUserSlot("0x0cD3d729Adb930B736Dad1DDd7C4FdF692e0dd0B").then((data) =>
+//   console.log("getUserSlot", data)
+// );
+getUserStats("0x786a7E3DD514E644f88DBE198A327Ab1CB6D8676").then((data) =>
+  console.log("getUserStats", data)
 );
-getUserSlot("0x0cD3d729Adb930B736Dad1DDd7C4FdF692e0dd0B").then((data) =>
-  console.log("getUserSlot", data)
-);
+// getMatrixInfo("0x786a7E3DD514E644f88DBE198A327Ab1CB6D8676").then((data) => console.log(data)); 

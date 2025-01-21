@@ -126,6 +126,7 @@ const handleSlotWithSubSlots = async (req, res) => {
   try {
     const { userId } = req.params;
     const currentSlot = await getSlotsWithSubSlots(userId);
+
     return sendResponse(
       res,
       200,

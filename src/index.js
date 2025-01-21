@@ -88,13 +88,13 @@ listenToEvents();
 // getUserInfo("0x752d8836b2Bc92d8838668188CFbbD74a309F982").then((data) =>
 //   console.log(data)
 // );
-// getUserSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data) =>
+// getUserSlot("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data) =>
 //   console.log("getUserSlot", data)
 // );
 
-getLevelReferralDetails("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd",2).then(
-  (data) => console.log("getUserStats", data)
-);
+// getLevelReferralDetails("0xa26934981D50287F62FDbEf54Ae84c815B3E4dd0", 1).then(
+//   (data) => console.log("getUserStats", data)
+// );
 // getUserStats("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data) =>
 //   console.log("getUserStats", data)
 // );

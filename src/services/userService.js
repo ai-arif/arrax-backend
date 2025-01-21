@@ -5,7 +5,10 @@ const User = require("../models/User");
 const Slot = require("../models/Slot");
 const SubSlot = require("../models/SubSlot");
 const { generateToken } = require("./tokenService");
-const { getUserSlot } = require("../controllers/bookingContractController");
+const {
+  getUserSlot,
+  getLevelReferralDetails,
+} = require("../controllers/bookingContractController");
 const getNextSequence = require("../utils/getNextSequence");
 const {
   getUserIncome,
@@ -217,14 +220,41 @@ const getSlotsWithSubSlots = async (userId) => {
     if (!user) {
       throw new Error("User not found");
     }
-    console.log("getting slot for ", user?.walletAddress);
+
+    console.log("Getting slot for", user?.walletAddress);
+
     const currentSlot = await getUserSlot(user.walletAddress);
-    console.log(currentSlot);
-    console.log(await getLevelReferralDetails(user?.walletAddress,currentSlot.data))
+    const activeSlot = currentSlot?.activeSlot;
+
+    // Array to store slot information
+    const slotDetails = [];
+
+    // If activeSlot > 0, loop through and get getLevelReferralDetails
+    if (activeSlot > 0) {
+      for (let i = 0; i < activeSlot; i++) {
+        const levelReferralDetails = await getLevelReferralDetails(
+          user.walletAddress,
+          i + 1
+        );
+
+        // Convert BigInt fields to string
+        const convertedDetails = JSON.parse(
+          JSON.stringify(levelReferralDetails, (_, value) =>
+            typeof value === "bigint" ? value.toString() : value
+          )
+        );
+
+        slotDetails.push({ slot: i + 1, data: convertedDetails?.data });
+      }
+    }
+
+    // Optionally, add slotDetails to currentSlot for reference
+    currentSlot.slotDetails = slotDetails;
 
     return currentSlot;
   } catch (error) {
     console.error("Error fetching slots and subSlots:", error);
+    throw error;
   }
 };
 

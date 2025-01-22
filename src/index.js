@@ -8,6 +8,7 @@ const path = require("path");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const testRoutes = require("./routes/testBlockchainFormatRoutes");
 const cors = require("cors");
 const userListener = require("./cmd/userListener");
 const { get } = require("http");
@@ -28,6 +29,7 @@ const {
   getUserStats,
   getAdminStats,
   getLevelReferralDetails,
+  upgradeUserSlot,
 } = require("./controllers/bookingContractController");
 // const { getSlotInfo } = require("./controllers/bookingContractController");
 const morganFormat =
@@ -66,6 +68,7 @@ app.get("/", (req, res) => {
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/test", testRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
@@ -89,12 +92,10 @@ listenToEvents();
 // getUserInfo("0x752d8836b2Bc92d8838668188CFbbD74a309F982").then((data) =>
 //   console.log(data)
 // );
-getUserSlot("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data) =>
-  console.log("getUserSlot", data)
-);
-getLevelReferralDetails("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd", 1).then(
-  (data) => console.log("getLevelReferralDetails", data)
-);
+
+// getLevelReferralDetails("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd", 1).then(
+//   (data) => console.log("getLevelReferralDetails", data)
+// );
 // getUserReferralStats("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data) =>
 //   console.log("getUserReferralStats", data)
 // );
@@ -102,3 +103,9 @@ getLevelReferralDetails("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd", 1).then(
 //   console.log("getUserStats", data)
 // );
 // getAdminStats().then((data)=>console.log(data))
+getUserSlot("0x8d184c3F686c75837dd135825F1D4Ad68E102753").then((data) =>
+  console.log("getUserSlot", data)
+);
+// upgradeUserSlot("0x8d184c3F686c75837dd135825F1D4Ad68E102753", 2).then((data) =>
+//   console.log(data)
+// );

@@ -2,7 +2,16 @@ const User = require("../models/User");
 const Slot = require("../models/Slot");
 const SubSlot = require("../models/SubSlot");
 const Transaction = require("../models/Transaction");
-const { isPaused } = require("../controllers/RegisterationContractController");
+const {
+  isPaused,
+  pauseContract,
+  unpauseContract,
+} = require("../controllers/RegisterationContractController");
+const {
+  isPurchasePaused,
+  purchasePause,
+  purchaseUnpause,
+} = require("../controllers/bookingContractController");
 // take walletAddress and fullName also page and limit
 const getAllUsersService = async (
   walletAddress,
@@ -109,8 +118,10 @@ const getUserByIdService = async (userId) => {
 const getSettingsStatus = async () => {
   try {
     const isRegistrationPaused = await isPaused();
+    const isPurchasingPaused = await isPurchasePaused();
     return {
       isRegistrationPaused: isRegistrationPaused.data,
+      isPurchasingPaused: isPurchasingPaused.data,
     };
   } catch (error) {
     console.error("Error fetching settings:", error);
@@ -118,4 +129,33 @@ const getSettingsStatus = async () => {
   }
 };
 
-module.exports = { getAllUsersService, getUserByIdService, getSettingsStatus };
+// updateRegistraion
+const updateRegistrationStatus = async (status) => {
+  // true or false
+  console.log(status);
+  if (status) {
+    await unpauseContract();
+  } else {
+    await pauseContract();
+  }
+  return true;
+};
+
+const updatePurchasingStatus = async (status) => {
+  console.log(status);
+  // true or false
+  if (status) {
+    await purchaseUnpause();
+  } else {
+    await purchasePause();
+  }
+  return true;
+};
+
+module.exports = {
+  getAllUsersService,
+  getUserByIdService,
+  getSettingsStatus,
+  updateRegistrationStatus,
+  updatePurchasingStatus,
+};

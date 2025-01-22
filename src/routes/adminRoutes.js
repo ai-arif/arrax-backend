@@ -4,6 +4,8 @@ const {
   getAllUsers,
   getUserById,
   getSettings,
+  updateRegistration,
+  updatePurchasing,
 } = require("../controllers/adminController");
 // get all users,
 router.get("/users", getAllUsers);
@@ -11,5 +13,9 @@ router.get("/users", getAllUsers);
 router.get("/user/:userId", getUserById);
 // get settings
 router.get("/settings", getSettings);
+// update registration status
+router.put("/update-registration", updateRegistration);
+// update purchasing status
+router.put("/update-purchasing", updatePurchasing);
 
 module.exports = router;

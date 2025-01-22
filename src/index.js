@@ -27,6 +27,7 @@ const {
   getMatrixInfo,
   getUserStats,
   getAdminStats,
+  getLevelReferralDetails,
 } = require("./controllers/bookingContractController");
 // const { getSlotInfo } = require("./controllers/bookingContractController");
 const morganFormat =
@@ -88,7 +89,7 @@ listenToEvents();
 // getUserInfo("0x752d8836b2Bc92d8838668188CFbbD74a309F982").then((data) =>
 //   console.log(data)
 // );
-// getUserSlot("0x786a7E3DD514E644f88DBE198A327Ab1CB6D8676").then((data) =>
+// getUserSlot("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data) =>
 //   console.log("getUserSlot", data)
 // );
 getUserStats("0x786a7E3DD514E644f88DBE198A327Ab1CB6D8676").then((data) =>

@@ -89,11 +89,16 @@ listenToEvents();
 // getUserInfo("0x752d8836b2Bc92d8838668188CFbbD74a309F982").then((data) =>
 //   console.log(data)
 // );
-// getUserSlot("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data) =>
-//   console.log("getUserSlot", data)
-// );
-getUserStats("0x786a7E3DD514E644f88DBE198A327Ab1CB6D8676").then((data) =>
-  console.log("getUserStats", data)
+getUserSlot("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data) =>
+  console.log("getUserSlot", data)
 );
-getAdminStats().then((data)=>console.log(data))
-
+getLevelReferralDetails("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd", 1).then(
+  (data) => console.log("getLevelReferralDetails", data)
+);
+// getUserReferralStats("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data) =>
+//   console.log("getUserReferralStats", data)
+// );
+// getUserStats("0x786a7E3DD514E644f88DBE198A327Ab1CB6D8676").then((data) =>
+//   console.log("getUserStats", data)
+// );
+// getAdminStats().then((data)=>console.log(data))

@@ -1,5 +1,8 @@
 const { ethers, JsonRpcProvider } = require("ethers");
-const { registrationContractABI, contractAddress } = require("../config/contractConfig");
+const {
+  registrationContractABI,
+  contractAddress,
+} = require("../config/contractConfig");
 const dotenv = require("dotenv");
 dotenv.config();
 const provider = new JsonRpcProvider(process.env.APP_RPC);
@@ -7,14 +10,18 @@ const provider = new JsonRpcProvider(process.env.APP_RPC);
 const getContract = () => {
   try {
     // console.log(contractAddress,registrationContractABI);
-    const contract = new ethers.Contract(contractAddress, registrationContractABI, provider);
+    const contract = new ethers.Contract(
+      contractAddress,
+      registrationContractABI,
+      provider
+    );
     return contract;
   } catch (error) {
     console.log("Error initializing contract:", error);
     return {
       success: false,
-      message: 'Contract initialization failed',
-      error: error.message
+      message: "Contract initialization failed",
+      error: error.message,
     };
   }
 };
@@ -22,21 +29,20 @@ const pauseContract = async () => {
   try {
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
     const contract = getContract().connect(wallet);
-    
+
     const transaction = await contract.pauseContract();
-    await transaction.wait();
 
     return {
       success: true,
-      message: 'Contract paused successfully',
-      data: transaction
+      message: "Contract paused successfully",
+      data: transaction,
     };
   } catch (error) {
-    console.error('Error in pauseContract:', error);
+    console.error("Error in pauseContract:", error);
     return {
       success: false,
-      message: 'Failed to pause contract',
-      error: error.message
+      message: "Failed to pause contract",
+      error: error.message,
     };
   }
 };
@@ -45,21 +51,20 @@ const unpauseContract = async () => {
   try {
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
     const contract = getContract().connect(wallet);
-    
+
     const transaction = await contract.unpauseContract();
-    await transaction.wait();
 
     return {
       success: true,
-      message: 'Contract unpaused successfully',
-      data: transaction
+      message: "Contract unpaused successfully",
+      data: transaction,
     };
   } catch (error) {
-    console.error('Error in unpauseContract:', error);
+    console.error("Error in unpauseContract:", error);
     return {
       success: false,
-      message: 'Failed to unpause contract',
-      error: error.message
+      message: "Failed to unpause contract",
+      error: error.message,
     };
   }
 };
@@ -71,43 +76,41 @@ const getRegistrationStatus = async () => {
     console.log(data);
     return {
       success: true,
-      status: data
+      status: data,
     };
   } catch (error) {
-    console.error('Error in getRegistrationStatus:', error);
+    console.error("Error in getRegistrationStatus:", error);
     return {
       success: false,
-      message: 'Getting Error Status failed',
-      error: error.message
+      message: "Getting Error Status failed",
+      error: error.message,
     };
   }
 };
-
-
 
 const getUserByReferrerId = async (referrerId) => {
   try {
     const contract = getContract();
     const user = await contract.getUserByReferrerId(referrerId);
-    
-    if (!user || user === '0x') {
+
+    if (!user || user === "0x") {
       return {
         success: false,
-        message: 'Referrer not found',
-        data: null
+        message: "Referrer not found",
+        data: null,
       };
     }
 
     return {
       success: true,
-      data: user
+      data: user,
     };
   } catch (error) {
-    console.error('Error in getUserByReferrerId:', error);
+    console.error("Error in getUserByReferrerId:", error);
     return {
       success: false,
-      message: 'Referrer lookup failed',
-      error: error.message
+      message: "Referrer lookup failed",
+      error: error.message,
     };
   }
 };
@@ -116,83 +119,80 @@ const getUserByUserId = async (userId) => {
   try {
     const contract = getContract();
     const user = await contract.getUserByUserId(userId);
-    
-    if (!user || user === '0x') {
+
+    if (!user || user === "0x") {
       return {
         success: false,
-        message: 'User ID not found',
-        data: null
+        message: "User ID not found",
+        data: null,
       };
     }
 
     return {
       success: true,
-      data: user
+      data: user,
     };
   } catch (error) {
-    console.error('Error in getUserByUserId:', error);
+    console.error("Error in getUserByUserId:", error);
     return {
       success: false,
-      message: 'User ID lookup failed',
-      error: error.message
+      message: "User ID lookup failed",
+      error: error.message,
     };
   }
 };
 
 const getUserInfo = async (userAddress) => {
   try {
-  
     const contract = getContract();
     const user = await contract.getUserInfo(userAddress);
     console.log(user);
-    
-    if (!user || user === '0x') {
+
+    if (!user || user === "0x") {
       return {
         success: false,
-        message: 'User not found',
-        data: null
+        message: "User not found",
+        data: null,
       };
     }
 
     return {
       success: true,
-      data: user
+      data: user,
     };
   } catch (error) {
-    console.error('Error in getUserInfo:', error);
+    console.error("Error in getUserInfo:", error);
     return {
       success: false,
-      message: 'User lookup failed',
-      error: error.message
+      message: "User lookup failed",
+      error: error.message,
     };
   }
 };
-
-
 
 const getUserReferrals = async (userAddress) => {
   try {
     const contract = getContract();
     const referrals = await contract.getUserReferrals(userAddress);
-    
+
     if (!referrals) {
       return {
         success: false,
-        message: 'No referrals found',
-        data: []
+        message: "No referrals found",
+        data: [],
       };
     }
 
     return {
       success: true,
-      data: referrals
+      data: referrals,
     };
   } catch (error) {
-    console.log('Error in getUserReferrals:', error);
+    console.log("Error in getUserReferrals:", error);
     return {
       success: false,
-      message: 'Referrals lookup failed',
-      error: error.message
+      message: "Referrals lookup failed",
+      error: error.message,
     };
   }
 };
@@ -201,17 +201,17 @@ const getTotalUsers = async () => {
   try {
     const contract = getContract();
     const total = await contract.totalUsers();
-    
+
     return {
       success: true,
-      data: total
+      data: total,
     };
   } catch (error) {
-    console.error('Error in getTotalUsers:', error);
+    console.error("Error in getTotalUsers:", error);
     return {
       success: false,
-      message: 'Total users lookup failed',
-      error: error.message
+      message: "Total users lookup failed",
+      error: error.message,
     };
   }
 };
@@ -220,17 +220,17 @@ const getRegistrationFee = async () => {
   try {
     const contract = getContract();
     const fee = await contract.registrationFee();
-    
+
     return {
       success: true,
-      data: fee
+      data: fee,
     };
   } catch (error) {
-    console.log('Error in getRegistrationFee:', error);
+    console.log("Error in getRegistrationFee:", error);
     return {
       success: false,
-      message: 'Registration fee lookup failed',
-      error: error.message
+      message: "Registration fee lookup failed",
+      error: error.message,
     };
   }
 };
@@ -239,25 +239,25 @@ const getFeeCollector = async () => {
   try {
     const contract = getContract();
     const collector = await contract.feeCollector();
-    
+
     if (!collector) {
       return {
         success: false,
-        message: 'Fee collector not found',
-        data: null
+        message: "Fee collector not found",
+        data: null,
       };
     }
 
     return {
       success: true,
-      data: collector
+      data: collector,
     };
   } catch (error) {
-    console.log('Error in getFeeCollector:', error);
+    console.log("Error in getFeeCollector:", error);
     return {
       success: false,
-      message: 'Fee collector lookup failed',
-      error: error.message
+      message: "Fee collector lookup failed",
+      error: error.message,
     };
   }
 };
@@ -266,25 +266,25 @@ const getPaymentToken = async () => {
   try {
     const contract = getContract();
     const token = await contract.paymentToken();
-    
+
     if (!token) {
       return {
         success: false,
-        message: 'Payment token not found',
-        data: null
+        message: "Payment token not found",
+        data: null,
       };
     }
 
     return {
       success: true,
-      data: token
+      data: token,
     };
   } catch (error) {
-    console.log('Error in getPaymentToken:', error);
+    console.log("Error in getPaymentToken:", error);
     return {
       success: false,
-      message: 'Payment token lookup failed',
-      error: error.message
+      message: "Payment token lookup failed",
+      error: error.message,
     };
   }
 };
@@ -293,17 +293,17 @@ const isPaused = async () => {
   try {
     const contract = getContract();
     const paused = await contract.paused();
-    
+
     return {
       success: true,
-      data: paused
+      data: paused,
     };
   } catch (error) {
-    console.log('Error in isPaused:', error);
+    console.log("Error in isPaused:", error);
     return {
       success: false,
-      message: 'Contract pause status check failed',
-      error: error.message
+      message: "Contract pause status check failed",
+      error: error.message,
     };
   }
 };
@@ -319,6 +319,5 @@ module.exports = {
   getPaymentToken,
   isPaused,
   pauseContract,
-  unpauseContract
-
+  unpauseContract,
 };

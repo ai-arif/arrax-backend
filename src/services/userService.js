@@ -8,6 +8,7 @@ const { generateToken } = require("./tokenService");
 const {
   getUserSlot,
   getLevelReferralDetails,
+  getAdminStats,
 } = require("../controllers/bookingContractController");
 const getNextSequence = require("../utils/getNextSequence");
 const {
@@ -219,6 +220,10 @@ const getSlotsWithSubSlots = async (userId) => {
 
     if (!user) {
       throw new Error("User not found");
+    }
+    if (user?.isOwner) {
+      const stats = await getAdminStats();
+      console.log("stats getting ", stats);
     }
 
     console.log("Getting slot for", user?.walletAddress);

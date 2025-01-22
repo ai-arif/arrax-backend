@@ -26,6 +26,7 @@ const {
   getUserReferralStats,
   getMatrixInfo,
   getUserStats,
+  getAdminStats,
 } = require("./controllers/bookingContractController");
 // const { getSlotInfo } = require("./controllers/bookingContractController");
 const morganFormat =
@@ -93,3 +94,5 @@ listenToEvents();
 getUserStats("0x786a7E3DD514E644f88DBE198A327Ab1CB6D8676").then((data) =>
   console.log("getUserStats", data)
 );
+getAdminStats().then((data)=>console.log(data))
+

@@ -115,6 +115,25 @@ const getUserSlot= async (userAddress) => {
   };
 
 
+  const getAdminStats= async () => {
+    try {
+      const contract = getContract();
+      const data = await contract.getAdminStats()
+     
+
+      return {
+        success: true,
+        data
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: `Failed to getting slots: ${error.message}`
+      };
+    }
+  };
+
+
 
 const getUserIncome = async (userAddress) => {
   try {
@@ -263,6 +282,30 @@ const getUserStats = async (address) => {
 //   }
 // };
 
+const upgradeUserSlot = async (userAddress, level) => {
+  try {
+    const contract = getContract();
+    const signer = userWallet.connect(provider);
+    const contractWithSigner = contract.connect(signer);
+
+    const tx = await contractWithSigner.purchaseSlot(userAddress, level);
+    const receipt = await tx.wait();
+
+    return {
+      success: true,
+      data: {
+        transactionHash: receipt.hash,
+        level
+      }
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: `Slot purchase failed: ${error.message}`
+    };
+  }
+};
+
 module.exports = {
   getCurrentSlot,
   getUserActiveSlots,
@@ -271,7 +314,9 @@ module.exports = {
   getMatrixInfo,
   getUserSlot,
   getSlotData,
-  getUserStats
+  getUserStats,
+  getAdminStats,
+  upgradeUserSlot
 //   purchaseSlot,
 //   autoUpgrade
 };

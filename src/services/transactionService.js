@@ -32,6 +32,8 @@ const insertTransaction = async ({
       ...userInfo.income,
       ...receiverIncome.data,
     };
+    // update the userInfo isActive to true
+    userInfo.isActive = true;
     await userInfo.save();
     fromUser.income = {
       ...fromUser.income,

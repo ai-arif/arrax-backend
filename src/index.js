@@ -114,10 +114,13 @@ getLevelReferralDetails("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd", 1).then(
 //   console.log("getUserStats", data)
 // );
 // getAdminStats().then((data)=>console.log(data))
-// getUserSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data) =>
-//   console.log("getUserSlot", data)
-// );
-// upgradeUserSlot("0x54CBF688c899FafDF0b9Feb8D016B426b7827436", 5
-// ).then((data) =>
-//   console.log(data)
-// );
+
+
+getUserSlot("0x91fBa4A117dC5B356901Ee88d708432636995403").then((data) =>
+  console.log("getUserSlot", data)
+);
+
+upgradeUserSlot("0x91fBa4A117dC5B356901Ee88d708432636995403", 4
+).then((data) =>
+  console.log(data)
+);

@@ -24,7 +24,7 @@ const insertOrderInfo = async ({ user, level, price, transactionHash }) => {
       }, // Data to update or insert
       { new: true, upsert: true } // Return the updated document and create if it doesn't exist
     );
-    if (userInfo?.isActive) {
+    if (userInfo?.isActive == false) {
       updateActiveTeamCount(userInfo?.userId);
     }
 

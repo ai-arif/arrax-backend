@@ -5,6 +5,7 @@ const contractABI = require("../../ABI/registration.json");
 const rpcURL = process.env.APP_RPC;
 const provider = new JsonRpcProvider(rpcURL);
 const User = require("../models/User");
+
 const { loginOrRegisterUser } = require("../services/userService");
 const {
   getUserInfo,
@@ -32,10 +33,15 @@ async function userListener() {
       console.log("registrationTime", registrationTime);
       console.log("referrerAddress", referrerAddress);
       const userName = await contract.getUserByUserId(userId); // userName[6]
-      const referreInfo = await getUserInfo(referrerAddress); // admin reffer id 
+      const referreInfo = await getUserInfo(referrerAddress); // admin reffer id
       console.log("referreInfo", referreInfo);
       const reffererId = Number(referreInfo.data[0]) || Number(referreInfo[0]);
-      console.log("reffererId", reffererId, referreInfo.data[0], referreInfo[0]);
+      console.log(
+        "reffererId",
+        reffererId,
+        referreInfo.data[0],
+        referreInfo[0]
+      );
       fullName = userName[6];
       console.log("fullName", fullName);
       try {
@@ -47,7 +53,7 @@ async function userListener() {
           referrerAddress,
         });
 
-        console.log("user", user);  
+        console.log("user", user);
       } catch (error) {
         console.error("Error saving to MongoDB:", error);
       }

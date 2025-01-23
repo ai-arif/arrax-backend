@@ -93,19 +93,30 @@ listenToEvents();
 //   console.log(data)
 // );
 
-// getLevelReferralDetails("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd", 1).then(
-//   (data) => console.log("getLevelReferralDetails", data)
-// );
+getLevelReferralDetails("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd", 1).then(
+  (data) => {
+    const convertedDetails = JSON.parse(
+      JSON.stringify(data, (_, value) =>
+        typeof value === "bigint" ? value.toString() : value
+      )
+    );
+    console.log(convertedDetails.data);
+  }
+);
+
+// Convert BigInt fields to string
+
 // getUserReferralStats("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data) =>
 //   console.log("getUserReferralStats", data)
 // );
+
 // getUserStats("0x786a7E3DD514E644f88DBE198A327Ab1CB6D8676").then((data) =>
 //   console.log("getUserStats", data)
 // );
 // getAdminStats().then((data)=>console.log(data))
-getUserSlot("0x8d184c3F686c75837dd135825F1D4Ad68E102753").then((data) =>
-  console.log("getUserSlot", data)
-);
+// getUserSlot("0x8d184c3F686c75837dd135825F1D4Ad68E102753").then((data) =>
+//   console.log("getUserSlot", data)
+// );
 // upgradeUserSlot("0x8d184c3F686c75837dd135825F1D4Ad68E102753", 2).then((data) =>
 //   console.log(data)
 // );

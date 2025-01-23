@@ -1,14 +1,15 @@
 const { ethers, JsonRpcProvider } = require("ethers");
 const {
   matrixProABI,
-  bookingContractAddress,
+  bookingContractAddress,    tokenABI,
+  tokenContractAddress
 } = require("../config/contractConfig");
 const dotenv = require("dotenv");
 dotenv.config();
-
+const provider = new JsonRpcProvider(process.env.APP_RPC);
 const getContract = () => {
   try {
-    const provider = new JsonRpcProvider(process.env.APP_RPC);
+
     const contract = new ethers.Contract(
       bookingContractAddress,
       matrixProABI,
@@ -286,28 +287,43 @@ const getUserStats = async (address) => {
 //   }
 // };
 
+
 const upgradeUserSlot = async (userAddress, level) => {
   try {
-    const contract = getContract();
-    const signer = userWallet.connect(provider);
-    const contractWithSigner = contract.connect(signer);
+      const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+      const contract = getContract().connect(wallet);
+      const contractToken = new ethers.Contract(
+          tokenContractAddress, 
+          tokenABI, 
+          wallet
+      );
 
-    const tx = await contractWithSigner.purchaseSlot(userAddress, level);
-    const receipt = await tx.wait();
-
-    return {
-      success: true,
-      data: {
-        transactionHash: receipt.hash,
-        level
+      const sendTokensFees = await contract.slotPrices(level+1)
+      console.log("sendTokensFees", sendTokensFees.toString())
+      // Check current allowance
+      const allowance = await contractToken.allowance(wallet.address, bookingContractAddress);
+      console.log('Current allowance:', allowance.toString());
+      if (Number(allowance) < Number(sendTokensFees.toString())) {
+          const approveTx = await contractToken.approve(bookingContractAddress, sendTokensFees.toString());
+          await approveTx.wait();
+          const approveTx1 = await contractToken.approve(wallet.address, sendTokensFees.toString());
+          await approveTx1.wait();
+          console.log('Approval transaction completed');
       }
-    };
+      console.log(sendTokensFees.toString())
+      console.log("Working")
+
+      const upgradeTx = await contract.upgradeUserSlot(userAddress, level);
+      await upgradeTx.wait();
+
+      console.log(`User slot upgraded for address: ${userAddress} to level: ${level}`);
   } catch (error) {
-    return {
-      success: false,
-      error: `Slot purchase failed: ${error.message}`
-    }}
+      console.error("Error during upgrade:", error);
   }
+};
+
+
+
 
     const purchasePause = async () => {
       try {

@@ -103,9 +103,10 @@ listenToEvents();
 //   console.log("getUserStats", data)
 // );
 // getAdminStats().then((data)=>console.log(data))
-getUserSlot("0x8d184c3F686c75837dd135825F1D4Ad68E102753").then((data) =>
+getUserSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data) =>
   console.log("getUserSlot", data)
 );
-// upgradeUserSlot("0x8d184c3F686c75837dd135825F1D4Ad68E102753", 2).then((data) =>
-//   console.log(data)
-// );
+upgradeUserSlot("0x54CBF688c899FafDF0b9Feb8D016B426b7827436", 5
+).then((data) =>
+  console.log(data)
+);

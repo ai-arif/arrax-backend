@@ -111,11 +111,12 @@ const loginOrRegisterUser = async ({
     });
 
     // Update the referrer's direct referrals and total team count
-    referrer.directReferrals.push(user.userId);
+    // referrer.directReferrals.push(user.userId);
     referrer.totalTeam += 1;
     referrer.totalPartners += 1;
 
     await referrer.save();
+    updateReferrerTeam(referredBy, 1);
 
     // Generate a token for the new user
     const token = generateToken({
@@ -127,6 +128,16 @@ const loginOrRegisterUser = async ({
   } catch (error) {
     console.error("Error registering user:", error.message);
     throw error;
+  }
+};
+
+const updateReferrerTeam = async (userId, team) => {
+  // loop recursively through the referredBy, and increase everyone's team count, until you reach the owner where referredBy is null
+  let user = await User.findOne({ userId });
+  while (user.referredBy !== null) {
+    user = await User.findOne({ userId: user.referredBy });
+    user.totalTeam += team;
+    await user.save();
   }
 };
 
@@ -228,8 +239,10 @@ const getSlotsWithSubSlots = async (userId) => {
 
     console.log("Getting slot for", user?.walletAddress);
 
-    const currentSlot = await getUserSlot(user.walletAddress);
-    const activeSlot = currentSlot?.activeSlot;
+    const currentSlot = {
+      success: true,
+      activeSlot: user?.currentActiveSlot || 0,
+    };
 
     // const slotDetails = [];
     const slotDetails = await Slot.find({ userId: user.userId }).sort({

@@ -6,8 +6,9 @@ const {
   getLevelReferralDetails,
 } = require("../controllers/bookingContractController");
 
-const insertSlotInfo = async ({ user }) => {
+const insertSlotInfo = async ({ user, level }) => {
   try {
+    console.log("@@@@@@@@@ inserting slot started @@@@@@@@@@@");
     const userInfo = await User.findOne({ walletAddress: user });
     if (!userInfo) {
       throw new Error("User not found");
@@ -19,10 +20,12 @@ const insertSlotInfo = async ({ user }) => {
 
     userInfo.currentActiveSlot = activeSlot;
     await userInfo.save();
+    const currentLevel = Number(level);
+    console.log("Current level", currentLevel);
 
     const levelReferralDetails = await getLevelReferralDetails(
-      user.walletAddress,
-      activeSlot
+      userInfo.walletAddress,
+      currentLevel
     );
 
     const convertedDetails = JSON.parse(
@@ -30,15 +33,18 @@ const insertSlotInfo = async ({ user }) => {
         typeof value === "bigint" ? value.toString() : value
       )
     );
-    console.log(convertedDetails.data);
+    if (!convertedDetails?.data === undefined) {
+      throw new Error("No data found");
+    }
+    console.log("Details for current slot", convertedDetails.data);
 
     // Upsert logic: find an existing slot or create a new one
     const slot = await Slot.findOneAndUpdate(
-      { userId: userInfo?.userId, slot: activeSlot }, // Filter by userId and slot
+      { userId: userInfo?.userId, slot: currentLevel }, // Filter by userId and slot
       {
         userId: userInfo?.userId,
         walletAddress: user,
-        slot: activeSlot,
+        slot: currentLevel,
         data: convertedDetails.data,
       }, // Data to update or insert
       { new: true, upsert: true } // Return the updated document and create if it doesn't exist

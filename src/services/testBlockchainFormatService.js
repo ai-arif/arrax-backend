@@ -4,6 +4,7 @@ const {
 } = require("../controllers/bookingContractController");
 const Slot = require("../models/Slot");
 const User = require("../models/User");
+const { insertSlotInfo } = require("./slotService");
 
 const testBlockchainFormatService = async () => {
   try {
@@ -20,23 +21,24 @@ const testBlockchainFormatService = async () => {
 
       // Process each active slot
       for (let i = 0; i < activeSlot; i++) {
-        const levelReferralDetails = await getLevelReferralDetails(
-          user.walletAddress,
-          i + 1
-        );
+        // const levelReferralDetails = await getLevelReferralDetails(
+        //   user.walletAddress,
+        //   i + 1
+        // );
+        await insertSlotInfo({ user: user.walletAddress, level: i + 1 });
 
         // Push formatted slot data
-        slotDetails.push({
-          slot: i + 1,
-          data: {
-            referralCount: levelReferralDetails?.data?.referralCount.toString(),
-            recycleCount: levelReferralDetails?.data?.recycleCount.toString(),
-            slotTransactions:
-              levelReferralDetails?.data?.slotTransactions.toString(),
-            isUpgraded: levelReferralDetails?.data?.isUpgraded,
-            isActive: levelReferralDetails?.data?.isActive,
-          },
-        });
+        // slotDetails.push({
+        //   slot: i + 1,
+        //   data: {
+        //     referralCount: levelReferralDetails?.data?.referralCount.toString(),
+        //     recycleCount: levelReferralDetails?.data?.recycleCount.toString(),
+        //     slotTransactions:
+        //       levelReferralDetails?.data?.slotTransactions.toString(),
+        //     isUpgraded: levelReferralDetails?.data?.isUpgraded,
+        //     isActive: levelReferralDetails?.data?.isActive,
+        //   },
+        // });
       }
 
       // Push formatted data for the user

@@ -137,7 +137,7 @@ const listenToEvents = () => {
       price,
       // transactionHash: event.transactionHash,
     });
-    await insertSlotInfo({ user });
+    await insertSlotInfo({ user, level });
   });
 
   contract.on("MatrixComplete", (user, level, event) => {

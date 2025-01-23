@@ -221,37 +221,38 @@ const getSlotsWithSubSlots = async (userId) => {
     if (!user) {
       throw new Error("User not found");
     }
-    if (user?.isOwner) {
-      const stats = await getAdminStats();
-      console.log("stats getting ", stats);
-    }
+    // if (user?.isOwner) {
+    //   const stats = await getAdminStats();
+    //   console.log("stats getting ", stats);
+    // }
 
     console.log("Getting slot for", user?.walletAddress);
 
     const currentSlot = await getUserSlot(user.walletAddress);
     const activeSlot = currentSlot?.activeSlot;
 
-    // Array to store slot information
-    const slotDetails = [];
+    // const slotDetails = [];
+    const slotDetails = await Slot.find({ userId: user.userId }).sort({
+      slot: 1,
+    });
 
-    // If activeSlot > 0, loop through and get getLevelReferralDetails
-    if (activeSlot > 0) {
-      for (let i = 0; i < activeSlot; i++) {
-        const levelReferralDetails = await getLevelReferralDetails(
-          user.walletAddress,
-          i + 1
-        );
+    // if (activeSlot > 0) {
+    //   for (let i = 0; i < activeSlot; i++) {
+    //     const levelReferralDetails = await getLevelReferralDetails(
+    //       user.walletAddress,
+    //       i + 1
+    //     );
 
-        // Convert BigInt fields to string
-        const convertedDetails = JSON.parse(
-          JSON.stringify(levelReferralDetails, (_, value) =>
-            typeof value === "bigint" ? value.toString() : value
-          )
-        );
+    //     // Convert BigInt fields to string
+    //     const convertedDetails = JSON.parse(
+    //       JSON.stringify(levelReferralDetails, (_, value) =>
+    //         typeof value === "bigint" ? value.toString() : value
+    //       )
+    //     );
 
-        slotDetails.push({ slot: i + 1, data: convertedDetails?.data });
-      }
-    }
+    //     slotDetails.push({ slot: i + 1, data: convertedDetails?.data });
+    //   }
+    // }
 
     // Optionally, add slotDetails to currentSlot for reference
     currentSlot.slotDetails = slotDetails;

@@ -51,6 +51,40 @@ const insertSlotInfo = async ({ user, level }) => {
     );
 
     console.log("Slot information upserted successfully");
+    if (userInfo.referredBy !== null) {
+      const referrearUser = await User.findOne({
+        walletAddress: userInfo.referredBy,
+      });
+
+      if (referrearUser) {
+        const referralLevelReferralDetails = await getLevelReferralDetails(
+          referrearUser.walletAddress,
+          currentLevel
+        );
+
+        const convertedReferralDetails = JSON.parse(
+          JSON.stringify(referralLevelReferralDetails, (_, value) =>
+            typeof value === "bigint" ? value.toString() : value
+          )
+        );
+        if (!convertedReferralDetails?.data === undefined) {
+          throw new Error("No data found");
+        }
+        console.log("Details for current slot", convertedReferralDetails.data);
+        const referralSlot = await Slot.findOneAndUpdate(
+          { userId: referrearUser?.userId, slot: currentLevel }, // Filter by userId and slot
+          {
+            userId: referrearUser?.userId,
+            walletAddress: referrearUser.walletAddress,
+            slot: currentLevel,
+            data: convertedReferralDetails.data,
+          }, // Data to update or insert
+          { new: true, upsert: true } // Return the updated document and create if it doesn't exist
+        );
+        console.log("Referral Slot information upserted successfully");
+      }
+    }
+
     return slot;
   } catch (error) {
     console.error("Error inserting/updating slot info:", error.message);

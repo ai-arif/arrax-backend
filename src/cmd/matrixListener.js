@@ -8,6 +8,7 @@ const {
 const dotenv = require("dotenv");
 const { insertOrderInfo } = require("../services/orderService.js");
 const { insertTransaction } = require("../services/transactionService.js");
+const { insertSlotInfo } = require("../services/slotService.js");
 
 dotenv.config();
 
@@ -136,6 +137,7 @@ const listenToEvents = () => {
       price,
       // transactionHash: event.transactionHash,
     });
+    await insertSlotInfo({ user, level });
   });
 
   contract.on("MatrixComplete", (user, level, event) => {

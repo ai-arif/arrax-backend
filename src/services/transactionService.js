@@ -16,16 +16,26 @@ const insertTransaction = async ({
       throw new Error("User not found");
     }
     const fromUser = await User.findOne({ walletAddress: from });
-    const transaction = await Transaction.create({
-      receiverId: userInfo?.userId,
-      receiver: user,
-      from,
-      fromId: fromUser?.userId,
-      amount,
-      level,
-      incomeType,
-      transactionHash,
-    });
+    const transaction = await Transaction.findOneAndUpdate(
+      {
+        receiverId: userInfo?.userId,
+        fromId: fromUser?.userId,
+        amount,
+        level,
+      }, // Filter for matching fields
+      {
+        receiverId: userInfo?.userId,
+        receiver: user,
+        from,
+        fromId: fromUser?.userId,
+        amount,
+        level,
+        incomeType,
+        transactionHash,
+      }, // Data to update or insert
+      { new: true, upsert: true } // Create if not found, return the updated document
+    );
+
     const receiverIncome = await getUserIncome(userInfo?.walletAddress);
     const fromIncome = await getUserIncome(fromUser?.walletAddress);
     userInfo.income = {

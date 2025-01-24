@@ -4,6 +4,7 @@ const Slot = require("../models/Slot");
 const {
   getUserSlot,
   getLevelReferralDetails,
+  upgradeUserSlot,
 } = require("../controllers/bookingContractController");
 
 const insertSlotInfo = async ({ user, level }) => {
@@ -92,4 +93,77 @@ const insertSlotInfo = async ({ user, level }) => {
   }
 };
 
-module.exports = { insertSlotInfo };
+const upgradeAnotherUserSlot = async (userAddress, level) => {
+  try {
+    const user = await User.findOne({ walletAddress: userAddress });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const upgradeUser = await upgradeUserSlot(userAddress, level);
+    if (!upgradeUser) {
+      throw new Error("User not found");
+    }
+    const currentSlot = await getUserSlot(userAddress);
+    const activeSlot = currentSlot?.activeSlot;
+    user.currentActiveSlot = activeSlot;
+    await user.save();
+    const currentLevel = Number(level);
+    const levelReferralDetails = await getLevelReferralDetails(
+      userAddress,
+      currentLevel
+    );
+    const convertedDetails = JSON.parse(
+      JSON.stringify(levelReferralDetails, (_, value) =>
+        typeof value === "bigint" ? value.toString() : value
+      )
+    );
+    if (!convertedDetails?.data === undefined) {
+      throw new Error("No data found");
+    }
+    const slot = await Slot.findOneAndUpdate(
+      { userId: user?.userId, slot: currentLevel }, // Filter by userId and slot
+      {
+        userId: user?.userId,
+        walletAddress: userAddress,
+        slot: currentLevel,
+        data: convertedDetails.data,
+      }, // Data to update or insert
+      { new: true, upsert: true } // Return the updated document and create if it doesn't exist
+    );
+    if (user.referredBy !== null) {
+      const referrearUser = await User.findOne({
+        walletAddress: user.referredBy,
+      });
+      if (referrearUser) {
+        const referralLevelReferralDetails = await getLevelReferralDetails(
+          referrearUser.walletAddress,
+          currentLevel
+        );
+        const convertedReferralDetails = JSON.parse(
+          JSON.stringify(referralLevelReferralDetails, (_, value) =>
+            typeof value === "bigint" ? value.toString() : value
+          )
+        );
+        if (!convertedReferralDetails?.data === undefined) {
+          throw new Error("No data found");
+        }
+        const referralSlot = await Slot.findOneAndUpdate(
+          { userId: referrearUser?.userId, slot: currentLevel }, // Filter by userId and slot
+          {
+            userId: referrearUser?.userId,
+            walletAddress: referrearUser.walletAddress,
+            slot: currentLevel,
+            data: convertedReferralDetails.data,
+          }, // Data to update or insert
+          { new: true, upsert: true } // Return the updated document and create if it doesn't exist
+        );
+      }
+    }
+    return slot;
+  } catch (error) {
+    console.error("Error inserting/updating slot info:", error.message);
+    throw error;
+  }
+};
+
+module.exports = { insertSlotInfo, upgradeAnotherUserSlot };

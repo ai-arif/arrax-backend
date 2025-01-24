@@ -6,6 +6,7 @@ const {
   updateRegistrationStatus,
   updatePurchasingStatus,
 } = require("../services/adminService");
+const { upgradeAnotherUserSlot } = require("../services/slotService");
 
 const getAllUsers = async (req, res) => {
   // handle with proper pagination and search by fullName and walletAddress
@@ -61,10 +62,21 @@ const updatePurchasing = async (req, res) => {
   }
 };
 
+const upgradeUserSlotController = async (req, res) => {
+  try {
+    const { userAddress, level } = req.body;
+    const result = await upgradeAnotherUserSlot(userAddress, level);
+    return sendResponse(res, 200, true, "User slot upgraded.", result);
+  } catch (error) {
+    return sendResponse(res, 500, false, error.message, null);
+  }
+};
+
 module.exports = {
   getAllUsers,
   getUserById,
   getSettings,
   updateRegistration,
   updatePurchasing,
+  upgradeUserSlotController,
 };

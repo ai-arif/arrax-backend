@@ -6,6 +6,7 @@ const {
   getSettings,
   updateRegistration,
   updatePurchasing,
+  upgradeUserSlotController,
 } = require("../controllers/adminController");
 // get all users,
 router.get("/users", getAllUsers);
@@ -17,5 +18,8 @@ router.get("/settings", getSettings);
 router.put("/update-registration", updateRegistration);
 // update purchasing status
 router.put("/update-purchasing", updatePurchasing);
+
+// upgrade user slot
+router.post("/upgrade-user-slot", upgradeUserSlotController);
 
 module.exports = router;

@@ -1,6 +1,5 @@
 const User = require("../models/User");
 const Slot = require("../models/Slot");
-const SubSlot = require("../models/SubSlot");
 const Transaction = require("../models/Transaction");
 const {
   isPaused,
@@ -55,57 +54,19 @@ const getUserByIdService = async (userId) => {
     const user = await User.findOne({ userId });
 
     // Fetch slots with their corresponding subslots
-    const slotsWithSubSlots = await Slot.aggregate([
-      {
-        $match: { userId: parseInt(userId) },
-      },
-      {
-        $lookup: {
-          from: "subslots",
-          localField: "subSlotIds",
-          foreignField: "_id",
-          as: "subSlots",
-        },
-      },
-      {
-        $unwind: "$subSlots",
-      },
-      {
-        $sort: {
-          slotNumber: 1,
-          "subSlots.subSlotNumber": 1,
-        },
-      },
-      {
-        $group: {
-          _id: "$_id",
-          userId: { $first: "$userId" },
-          slotNumber: { $first: "$slotNumber" },
-          isActive: { $first: "$isActive" },
-          sectionsCompleted: { $first: "$sectionsCompleted" },
-          price: { $first: "$price" },
-          recycleCount: { $first: "$recycleCount" },
-          recycleUserCount: { $first: "$recycleUserCount" },
-          usersCount: { $first: "$usersCount" },
-          referrals: { $first: "$referrals" },
-          generationData: { $first: "$generationData" },
-          subSlots: { $push: "$subSlots" },
-        },
-      },
-      {
-        $sort: {
-          slotNumber: 1,
-        },
-      },
-    ]);
+    const slotDetails = await Slot.find({ userId }).sort({ slot: 1 });
 
-    // Fetch transactions
-    const transactions = await Transaction.find({ userId });
+    // Fetch last 10 transactions where fromId or receiverId matches userId
+    const transactions = await Transaction.find({
+      $or: [{ fromId: userId }, { receiverId: userId }],
+    })
+      .sort({ createdAt: -1 }) // Sort by most recent
+      .limit(10); // Limit to the last 10
 
     // Combine all data into a single response
     return {
       user,
-      slots: slotsWithSubSlots,
+      slots: slotDetails,
       transactions,
     };
   } catch (error) {
@@ -132,7 +93,7 @@ const getSettingsStatus = async () => {
 // updateRegistraion
 const updateRegistrationStatus = async (status) => {
   // true or false
-  console.log(status);
+
   if (status) {
     await unpauseContract();
   } else {

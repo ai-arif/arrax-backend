@@ -15,6 +15,7 @@ const {
   getUserIncome,
   getUserStats,
 } = require("../controllers/bookingContractController");
+const { insertOrderInfo } = require("./orderService");
 
 const registerOwner = async ({ walletAddress, fullName }) => {
   const existingOwner = await User.findOne({ isOwner: true });
@@ -63,7 +64,6 @@ const loginOrRegisterUser = async ({
       referrerAddress
     );
     let user = await User.findOne({ walletAddress });
-
     if (user) {
       const token = generateToken({
         userId: user.userId,
@@ -108,6 +108,7 @@ const loginOrRegisterUser = async ({
       referredBy,
       referrerAddress,
       isOwner: false,
+      currentActiveSlot: 0,
     });
 
     // Update the referrer's direct referrals and total team count

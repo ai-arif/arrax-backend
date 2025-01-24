@@ -238,11 +238,10 @@ const getSlotsWithSubSlots = async (userId) => {
     //   console.log("stats getting ", stats);
     // }
 
-    console.log("Getting slot for", user?.walletAddress);
-
+    const slotInfo = await getUserSlot(user?.walletAddress);
     const currentSlot = {
       success: true,
-      activeSlot: user?.currentActiveSlot || 0,
+      activeSlot: slotInfo.activeSlot,
     };
 
     // const slotDetails = [];

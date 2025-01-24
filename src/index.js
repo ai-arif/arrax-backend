@@ -93,16 +93,16 @@ listenToEvents();
 //   console.log(data)
 // );
 
-getLevelReferralDetails("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd", 1).then(
-  (data) => {
-    const convertedDetails = JSON.parse(
-      JSON.stringify(data, (_, value) =>
-        typeof value === "bigint" ? value.toString() : value
-      )
-    );
-    console.log(convertedDetails.data);
-  }
-);
+// getLevelReferralDetails("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd", 1).then(
+//   (data) => {
+//     const convertedDetails = JSON.parse(
+//       JSON.stringify(data, (_, value) =>
+//         typeof value === "bigint" ? value.toString() : value
+//       )
+//     );
+//     console.log(convertedDetails.data);
+//   }
+// );
 
 // Convert BigInt fields to string
 
@@ -115,12 +115,11 @@ getLevelReferralDetails("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd", 1).then(
 // );
 // getAdminStats().then((data)=>console.log(data))
 
-
 getUserSlot("0x91fBa4A117dC5B356901Ee88d708432636995403").then((data) =>
   console.log("getUserSlot", data)
 );
 
-upgradeUserSlot("0x91fBa4A117dC5B356901Ee88d708432636995403", 4
-).then((data) =>
-  console.log(data)
-);
+// upgradeUserSlot("0x91fBa4A117dC5B356901Ee88d708432636995403", 4
+// ).then((data) =>
+//   console.log(data)
+// );

@@ -1,3 +1,4 @@
+const { getUserSlot } = require("../controllers/bookingContractController");
 const Order = require("../models/Order");
 const User = require("../models/User");
 
@@ -8,9 +9,10 @@ const insertOrderInfo = async ({ user, level, price, transactionHash }) => {
       throw new Error("User not found");
     }
     console.log("User found to insert order info", userInfo?.userId);
-
-    userInfo.currentActiveSlot = Number(level);
+    const slotInfo = await getUserSlot(userInfo.walletAddress);
+    userInfo.currentActiveSlot = slotInfo?.activeSlot;
     await userInfo.save();
+    console.log("Current active slot", userInfo?.currentActiveSlot);
 
     // Upsert logic: find an existing order or create a new one
     const order = await Order.findOneAndUpdate(
@@ -24,6 +26,7 @@ const insertOrderInfo = async ({ user, level, price, transactionHash }) => {
       }, // Data to update or insert
       { new: true, upsert: true } // Return the updated document and create if it doesn't exist
     );
+
     if (userInfo?.isActive == false) {
       updateActiveTeamCount(userInfo?.userId);
     }

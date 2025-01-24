@@ -115,11 +115,10 @@ listenToEvents();
 // );
 // getAdminStats().then((data)=>console.log(data))
 
-getUserSlot("0x91fBa4A117dC5B356901Ee88d708432636995403").then((data) =>
+getUserSlot("0x4D001EE29f583431100B286d7160718E73eAAE96").then((data) =>
   console.log("getUserSlot", data)
 );
 
-// upgradeUserSlot("0x91fBa4A117dC5B356901Ee88d708432636995403", 4
-// ).then((data) =>
-//   console.log(data)
-// );
+upgradeUserSlot("0x4D001EE29f583431100B286d7160718E73eAAE96", 5).then((data) =>
+  console.log(data)
+);

@@ -9,6 +9,7 @@ const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const testRoutes = require("./routes/testBlockchainFormatRoutes");
+const homeRoutes = require("./routes/homeRoutes");
 const cors = require("cors");
 const userListener = require("./cmd/userListener");
 const { get } = require("http");
@@ -18,17 +19,8 @@ const {
 const { listenToEvents, getEventLogs } = require("./cmd/matrixListener");
 const { BN } = require("bn.js");
 const {
-  getCurrentSlotInfo,
-  getCurrentSlot,
-  getUserActiveSlots,
-  getUserIncome,
   getUserSlot,
-  getSlotData,
-  getUserReferralStats,
-  getMatrixInfo,
-  getUserStats,
-  getAdminStats,
-  getLevelReferralDetails,
+
   upgradeUserSlot,
 } = require("./controllers/bookingContractController");
 // const { getSlotInfo } = require("./controllers/bookingContractController");
@@ -66,6 +58,7 @@ app.get("/", (req, res) => {
 });
 
 // Routes
+app.use("/api/home", homeRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/test", testRoutes);
@@ -115,7 +108,7 @@ listenToEvents();
 // );
 // getAdminStats().then((data)=>console.log(data))
 
-getUserSlot("0x91fBa4A117dC5B356901Ee88d708432636995403").then((data) =>
+getUserSlot("0x4D001EE29f583431100B286d7160718E73eAAE96").then((data) =>
   console.log("getUserSlot", data)
 );
 

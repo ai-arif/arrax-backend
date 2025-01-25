@@ -11,6 +11,7 @@ const insertOrderInfo = async ({ user, level, price, transactionHash }) => {
     console.log("User found to insert order info", userInfo?.userId);
     const slotInfo = await getUserSlot(userInfo.walletAddress);
     userInfo.currentActiveSlot = slotInfo?.activeSlot;
+    console.log(userInfo.currentActiveSlot)
     await userInfo.save();
     console.log("Current active slot", userInfo?.currentActiveSlot);
 

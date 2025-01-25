@@ -138,6 +138,8 @@ const listenToEvents = () => {
       // transactionHash: event.transactionHash,
     });
     await insertSlotInfo({ user, level });
+    
+
   });
 
   contract.on("MatrixComplete", (user, level, event) => {
@@ -176,6 +178,7 @@ const listenToEvents = () => {
         incomeType,
         // transactionHash: event.transactionHash,
       });
+
     }
   );
 

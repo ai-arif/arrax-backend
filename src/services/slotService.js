@@ -14,20 +14,24 @@ const insertSlotInfo = async ({ user, level }) => {
     if (!userInfo) {
       throw new Error("User not found");
     }
+
+
     console.log("User found to insert slot info", userInfo?.userId);
 
-    const currentSlot = await getUserSlot(user.walletAddress);
+    const currentSlot = await getUserSlot(userInfo.walletAddress);
     const activeSlot = currentSlot?.activeSlot;
 
     userInfo.currentActiveSlot = activeSlot;
     await userInfo.save();
     const currentLevel = Number(level);
-    console.log("Current level", currentLevel);
+    console.log("Current level", currentLevel,currentSlot);
 
     const levelReferralDetails = await getLevelReferralDetails(
       userInfo.walletAddress,
       currentLevel
     );
+
+    console.log("Level referral details slot service ", levelReferralDetails);
 
     const convertedDetails = JSON.parse(
       JSON.stringify(levelReferralDetails, (_, value) =>
@@ -54,7 +58,7 @@ const insertSlotInfo = async ({ user, level }) => {
     console.log("Slot information upserted successfully");
     if (userInfo.referredBy !== null) {
       const referrearUser = await User.findOne({
-        walletAddress: userInfo.referredBy,
+        userId: userInfo.referredBy,
       });
 
       if (referrearUser) {

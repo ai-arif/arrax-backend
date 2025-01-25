@@ -16,6 +16,7 @@ const insertTransaction = async ({
       throw new Error("User not found");
     }
     const fromUser = await User.findOne({ walletAddress: from });
+
     const transaction = await Transaction.findOneAndUpdate(
       {
         receiverId: userInfo?.userId,
@@ -35,6 +36,8 @@ const insertTransaction = async ({
       }, // Data to update or insert
       { new: true, upsert: true } // Create if not found, return the updated document
     );
+    console.log("Transaction inserted successfully:", transaction);
+    console.log("got amount", amount);
 
     const receiverIncome = await getUserIncome(userInfo?.walletAddress);
     const fromIncome = await getUserIncome(fromUser?.walletAddress);

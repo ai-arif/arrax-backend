@@ -11,7 +11,7 @@ const insertOrderInfo = async ({ user, level, price, transactionHash }) => {
     console.log("User found to insert order info", userInfo?.userId);
     const slotInfo = await getUserSlot(userInfo.walletAddress);
     userInfo.currentActiveSlot = slotInfo?.activeSlot;
-    console.log(userInfo.currentActiveSlot)
+    console.log(userInfo.currentActiveSlot);
     await userInfo.save();
     console.log("Current active slot", userInfo?.currentActiveSlot);
 
@@ -28,9 +28,12 @@ const insertOrderInfo = async ({ user, level, price, transactionHash }) => {
       { new: true, upsert: true } // Return the updated document and create if it doesn't exist
     );
 
-    if (userInfo?.isActive == false) {
-      updateActiveTeamCount(userInfo?.userId);
+    if (!userInfo.isActive) {
+      userInfo.isActive = true;
+      updateActiveTeamCount(userInfo.userId);
     }
+    userInfo.currentActiveSlot = slotInfo?.activeSlot;
+    await userInfo.save();
 
     console.log("Order information upserted successfully");
 
@@ -43,18 +46,23 @@ const insertOrderInfo = async ({ user, level, price, transactionHash }) => {
 
 // activeTeam, recursively visit and update all by referredBy field, until you reach the owner where referredBy is null
 const updateActiveTeamCount = async (userId) => {
-  const user = await User.findOne({ userId });
-  if (!user) {
-    throw new Error("User not found");
-  }
-  if (user.referredBy) {
-    const referredByUser = await User.findOne({ userId: user.referredBy });
-    if (!referredByUser) {
-      throw new Error("Referred by user not found");
+  let currentUserId = userId;
+  while (currentUserId) {
+    const user = await User.findOne({ userId: currentUserId });
+    if (!user) break;
+
+    if (user.referredBy) {
+      const referredByUser = await User.findOne({ userId: user.referredBy });
+      if (referredByUser) {
+        referredByUser.activeTeam = (referredByUser.activeTeam || 0) + 1;
+        await referredByUser.save();
+        currentUserId = referredByUser.userId; // Move up the hierarchy
+      } else {
+        break;
+      }
+    } else {
+      break;
     }
-    referredByUser.activeTeam = referredByUser.activeTeam + 1;
-    await referredByUser.save();
-    await updateActiveTeamCount(referredByUser.userId);
   }
 };
 

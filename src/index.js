@@ -115,6 +115,6 @@ getUserSlot("0x4D001EE29f583431100B286d7160718E73eAAE96").then((data) =>
 //   console.log("getUserSlot", data)
 // );
 
-upgradeUserSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1", 6).then((data) =>
-  console.log(data)
-);
+// upgradeUserSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1", 6).then((data) =>
+//   console.log(data)
+// );

@@ -297,20 +297,21 @@ const upgradeUserSlot = async (userAddress, level) => {
           tokenABI, 
           wallet
       );
-      const sendTokensFees = await contract.slotPrices(level)
-      console.log("sendTokensFees", sendTokensFees.toString())
+      // const sendTokensFees = await contract.slotPrices(level)
+      // console.log("sendTokensFees", sendTokensFees.toString())
       // Check current allowance
       const allowance = await contractToken.allowance(wallet.address, bookingContractAddress);
+      
       console.log('Current allowance:', allowance.toString());
-      if (Number(allowance) < Number(sendTokensFees.toString())) {
-          const approveTx = await contractToken.approve(bookingContractAddress, sendTokensFees.toString());
-          await approveTx.wait();
-          const approveTx1 = await contractToken.approve(wallet.address, sendTokensFees.toString());
-          await approveTx1.wait();
-          console.log('Approval transaction completed');
-      }
-      console.log(sendTokensFees.toString())
-      console.log("Working")
+      // if (Number(allowance) < Number(sendTokensFees.toString())) {
+      //     const approveTx = await contractToken.approve(bookingContractAddress, "1000000000000000000000000000" );
+      //     await approveTx.wait();
+      //     const approveTx1 = await contractToken.approve(wallet.address, "1000000000000000000000000000");
+      //     await approveTx1.wait();
+      //     console.log('Approval transaction completed');
+      // }
+      // console.log(sendTokensFees.toString())
+      // console.log("Working")
 
       const upgradeTx = await contract.upgradeUserSlot(userAddress, level);
       await upgradeTx.wait();

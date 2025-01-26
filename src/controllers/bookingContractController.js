@@ -292,17 +292,17 @@ const upgradeUserSlot = async (userAddress, level) => {
   try {
       const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
       const contract = getContract().connect(wallet);
-      const contractToken = new ethers.Contract(
-          tokenContractAddress, 
-          tokenABI, 
-          wallet
-      );
+      // const contractToken = new ethers.Contract(
+      //     tokenContractAddress, 
+      //     tokenABI, 
+      //     wallet
+      // );
       // const sendTokensFees = await contract.slotPrices(level)
       // console.log("sendTokensFees", sendTokensFees.toString())
       // Check current allowance
-      const allowance = await contractToken.allowance(wallet.address, bookingContractAddress);
+      // const allowance = await contractToken.allowance(wallet.address, bookingContractAddress);
       
-      console.log('Current allowance:', allowance.toString());
+      // console.log('Current allowance:', allowance.toString());
       // if (Number(allowance) < Number(sendTokensFees.toString())) {
       //     const approveTx = await contractToken.approve(bookingContractAddress, "1000000000000000000000000000" );
       //     await approveTx.wait();

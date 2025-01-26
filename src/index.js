@@ -111,10 +111,12 @@ listenToEvents();
 // getUserSlot("0x4D001EE29f583431100B286d7160718E73eAAE96").then((data) =>
 //   console.log("getUserSlot", data)
 // );
-// getUserSlot("0x4D001EE29f583431100B286d7160718E73eAAE96").then((data) =>
-//   console.log("getUserSlot", data)
-// );
 
-upgradeUserSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1", 10).then((data) =>
+
+getUserSlot("0x755833b2cE3536840cfaD9f1b651C7278E2B4f00").then((data) =>
+  console.log("getUserSlot", data)
+);
+
+upgradeUserSlot("0x755833b2cE3536840cfaD9f1b651C7278E2B4f00", 10).then((data) =>
   console.log(data)
 );

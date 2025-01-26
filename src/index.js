@@ -113,10 +113,10 @@ listenToEvents();
 // );
 
 
-getUserSlot("0x755833b2cE3536840cfaD9f1b651C7278E2B4f00").then((data) =>
-  console.log("getUserSlot", data)
-);
+// getUserSlot("0x755833b2cE3536840cfaD9f1b651C7278E2B4f00").then((data) =>
+//   console.log("getUserSlot", data)
+// );
 
-upgradeUserSlot("0x755833b2cE3536840cfaD9f1b651C7278E2B4f00", 10).then((data) =>
-  console.log(data)
-);
+// upgradeUserSlot("0x755833b2cE3536840cfaD9f1b651C7278E2B4f00", 10).then((data) =>
+//   console.log(data)
+// );

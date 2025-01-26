@@ -297,8 +297,7 @@ const upgradeUserSlot = async (userAddress, level) => {
           tokenABI, 
           wallet
       );
-
-      const sendTokensFees = await contract.slotPrices(level+1)
+      const sendTokensFees = await contract.slotPrices(level)
       console.log("sendTokensFees", sendTokensFees.toString())
       // Check current allowance
       const allowance = await contractToken.allowance(wallet.address, bookingContractAddress);

@@ -52,9 +52,11 @@ const getAllUsersService = async (
 const getUserByIdService = async (userId) => {
   try {
     // Fetch user details
+
     const user = await User.findOne({ userId });
     const slotInfo = await getUserSlot(user?.walletAddress);
     const activeSlot = slotInfo.activeSlot;
+    console.log(activeSlot, "activeSlot");
 
     // Fetch slots with their corresponding subslots
     const slotDetails = await Slot.find({ userId }).sort({ slot: 1 });

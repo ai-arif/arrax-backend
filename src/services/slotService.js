@@ -15,7 +15,6 @@ const insertSlotInfo = async ({ user, level }) => {
       throw new Error("User not found");
     }
 
-
     console.log("User found to insert slot info", userInfo?.userId);
 
     const currentSlot = await getUserSlot(userInfo.walletAddress);
@@ -24,7 +23,7 @@ const insertSlotInfo = async ({ user, level }) => {
     userInfo.currentActiveSlot = activeSlot;
     await userInfo.save();
     const currentLevel = Number(level);
-    console.log("Current level", currentLevel,currentSlot);
+    console.log("Current level", currentLevel, currentSlot);
 
     const levelReferralDetails = await getLevelReferralDetails(
       userInfo.walletAddress,
@@ -99,13 +98,17 @@ const insertSlotInfo = async ({ user, level }) => {
 
 const upgradeAnotherUserSlot = async (userAddress, level) => {
   try {
+    console.log("received this", userAddress, level);
     const user = await User.findOne({ walletAddress: userAddress });
     if (!user) {
       throw new Error("User not found");
     }
+    console.log("going to upgrdate user slot");
+    console.log("user", user);
+    console.log("level", level);
     const upgradeUser = await upgradeUserSlot(userAddress, level);
     if (!upgradeUser) {
-      throw new Error("User not found");
+      throw new Error("");
     }
     const currentSlot = await getUserSlot(userAddress);
     const activeSlot = currentSlot?.activeSlot;

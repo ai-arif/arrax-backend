@@ -56,6 +56,24 @@ const getCurrentSlot = async (userAddress) => {
     };
   }
 };
+const getBSCFees = async () => {
+
+  console.log("BSC FEES")
+  try {
+    const contract = getContract();
+    const slotFees = await contract.BSC_FEE();
+  
+    return {
+      success: true,
+      data:slotFees
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: `Failed to get  slot fees: ${error.message}`,
+    };
+  }
+};
 
 const getUserActiveSlots = async (userAddress) => {
   try {
@@ -463,6 +481,7 @@ module.exports = {
   getLevelReferralDetails,
   changeSlotFees,
   //   purchaseSlot,
-  //   autoUpgrade
+  //   autoUpgrade,
+  getBSCFees
 };
 

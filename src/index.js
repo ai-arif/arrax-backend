@@ -108,14 +108,10 @@ listenToEvents();
 // );
 // getAdminStats().then((data)=>console.log(data))
 
-getUserSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data) =>
+getUserSlot("0x105E18D685d22eDF2d7a3dEb50a3A37F26E1C88D").then((data) =>
   console.log("getUserSlot", data)
 );
 
-// getUserSlot("0x755833b2cE3536840cfaD9f1b651C7278E2B4f00").then((data) =>
-//   console.log("getUserSlot", data)
+// upgradeUserSlot("0x105E18D685d22eDF2d7a3dEb50a3A37F26E1C88D", 10).then((data) =>
+//   console.log(data)
 // );
-
-upgradeUserSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1", 9).then((data) =>
-  console.log(data)
-);

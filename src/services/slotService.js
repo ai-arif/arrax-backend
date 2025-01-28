@@ -139,7 +139,7 @@ const upgradeAnotherUserSlot = async (userAddress, level) => {
     );
     if (user.referredBy !== null) {
       const referrearUser = await User.findOne({
-        walletAddress: user.referredBy,
+        userId: user.referredBy,
       });
       if (referrearUser) {
         const referralLevelReferralDetails = await getLevelReferralDetails(

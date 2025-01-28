@@ -22,6 +22,12 @@ const {
   getUserSlot,
 
   upgradeUserSlot,
+  getUserActiveSlots,
+  getUserStats,
+  getLevelReferralDetails,
+  getMatrixInfo,
+  getUserReferralStats,
+  getCurrentSlot,
 } = require("./controllers/bookingContractController");
 // const { getSlotInfo } = require("./controllers/bookingContractController");
 const morganFormat =
@@ -108,9 +114,10 @@ listenToEvents();
 // );
 // getAdminStats().then((data)=>console.log(data))
 
-getUserSlot("0x105E18D685d22eDF2d7a3dEb50a3A37F26E1C88D").then((data) =>
-  console.log("getUserSlot", data)
-);
+// getCurrentSlot("0x91fBa4A117dC5B356901Ee88d708432636995403").then((data) =>
+//   console.log("getUserSlot", data)
+// );
+
 
 // upgradeUserSlot("0x105E18D685d22eDF2d7a3dEb50a3A37F26E1C88D", 10).then((data) =>
 //   console.log(data)

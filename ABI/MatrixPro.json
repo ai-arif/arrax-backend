@@ -8,12 +8,12 @@
 			},
 			{
 				"internalType": "address",
-				"name": "_motherWallet",
+				"name": "_paymentToken",
 				"type": "address"
 			},
 			{
 				"internalType": "address",
-				"name": "_paymentToken",
+				"name": "_motherWallet",
 				"type": "address"
 			},
 			{

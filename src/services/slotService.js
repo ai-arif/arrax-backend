@@ -104,16 +104,18 @@ const upgradeAnotherUserSlot = async (userAddress, level) => {
       throw new Error("User not found");
     }
     console.log("going to upgrdate user slot");
-    console.log("user", user);
+
     console.log("level", level);
+    console.log("userAddress", userAddress);
+
     const upgradeUser = await upgradeUserSlot(userAddress, level);
-    if (!upgradeUser) {
-      throw new Error("");
-    }
+
     const currentSlot = await getUserSlot(userAddress);
     const activeSlot = currentSlot?.activeSlot;
     user.currentActiveSlot = activeSlot;
+    console.log("current active slot", activeSlot);
     await user.save();
+
     const currentLevel = Number(level);
     const levelReferralDetails = await getLevelReferralDetails(
       userAddress,
@@ -137,6 +139,8 @@ const upgradeAnotherUserSlot = async (userAddress, level) => {
       }, // Data to update or insert
       { new: true, upsert: true } // Return the updated document and create if it doesn't exist
     );
+    console.log("Slot information upserted successfully");
+    console.log(slot);
     if (user.referredBy !== null) {
       const referrearUser = await User.findOne({
         userId: user.referredBy,
@@ -164,11 +168,14 @@ const upgradeAnotherUserSlot = async (userAddress, level) => {
           }, // Data to update or insert
           { new: true, upsert: true } // Return the updated document and create if it doesn't exist
         );
+        console.log("Referral Slot information upserted successfully");
+        console.log(referralSlot);
       }
     }
     return slot;
   } catch (error) {
-    console.error("Error inserting/updating slot info:", error.message);
+    console.log("Error inserting/updating slot info:", error.message);
+    console.log(error);
     throw error;
   }
 };

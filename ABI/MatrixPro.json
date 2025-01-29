@@ -101,6 +101,25 @@
 		"inputs": [
 			{
 				"indexed": true,
+				"internalType": "uint256",
+				"name": "level",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "membersCount",
+				"type": "uint256"
+			}
+		],
+		"name": "MatrixReset",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
 				"internalType": "address",
 				"name": "previousOwner",
 				"type": "address"
@@ -327,50 +346,6 @@
 			{
 				"internalType": "uint256",
 				"name": "totalTransactions",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			}
-		],
-		"name": "getCurrentSlotInfo",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "currentActiveSlot",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "currentPosition",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "entryTime",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "matrixSize",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "recycleCount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "timeInPosition",
 				"type": "uint256"
 			}
 		],
@@ -801,6 +776,19 @@
 	{
 		"inputs": [],
 		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "level",
+				"type": "uint256"
+			}
+		],
+		"name": "resetSlotMatrix",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"

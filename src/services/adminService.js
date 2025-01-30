@@ -12,6 +12,7 @@ const {
   purchaseUnpause,
   getUserSlot,
   getBSCFees,
+  changeSlotFees,
 } = require("../controllers/bookingContractController");
 // take walletAddress and fullName also page and limit
 const getAllUsersService = async (
@@ -88,11 +89,13 @@ const getSettingsStatus = async () => {
     const isRegistrationPaused = await isPaused();
     const isPurchasingPaused = await isPurchasePaused();
     const fees = await getBSCFees();
+
     console.log(fees, "fees");
+
     return {
       isRegistrationPaused: isRegistrationPaused.data,
       isPurchasingPaused: isPurchasingPaused.data,
-      fees: fees,
+      fees: fees.data.toString(), // Convert BigInt to string
     };
   } catch (error) {
     console.error("Error fetching settings:", error);
@@ -122,11 +125,16 @@ const updatePurchasingStatus = async (status) => {
   }
   return true;
 };
-
+// changeSlotFees
+const updateFees = async (fees) => {
+  await changeSlotFees(fees);
+  return true;
+};
 module.exports = {
   getAllUsersService,
   getUserByIdService,
   getSettingsStatus,
   updateRegistrationStatus,
   updatePurchasingStatus,
+  updateFees,
 };

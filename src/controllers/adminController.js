@@ -5,6 +5,7 @@ const {
   getSettingsStatus,
   updateRegistrationStatus,
   updatePurchasingStatus,
+  updateFees,
 } = require("../services/adminService");
 const { upgradeAnotherUserSlot } = require("../services/slotService");
 
@@ -71,6 +72,16 @@ const upgradeUserSlotController = async (req, res) => {
     return sendResponse(res, 500, false, error.message, null);
   }
 };
+// req.body.fees
+const updateFeesController = async (req, res) => {
+  try {
+    const { fees } = req.body;
+    const result = await updateFees(fees);
+    return sendResponse(res, 200, true, "Fees updated.", result);
+  } catch (error) {
+    return sendResponse(res, 500, false, error.message, null);
+  }
+};
 
 module.exports = {
   getAllUsers,
@@ -79,4 +90,5 @@ module.exports = {
   updateRegistration,
   updatePurchasing,
   upgradeUserSlotController,
+  updateFeesController,
 };

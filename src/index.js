@@ -29,6 +29,9 @@ const {
   getUserReferralStats,
   getCurrentSlot,
 } = require("./controllers/bookingContractController");
+const User = require("./models/User");
+const Order = require("./models/Order");
+const Transaction = require("./models/Transaction");
 // const { getSlotInfo } = require("./controllers/bookingContractController");
 const morganFormat =
   ":method :url :status :res[content-length] - :response-time ms";
@@ -61,6 +64,25 @@ app.get("/", (req, res) => {
   const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
   // response as json
   res.json({ ip });
+});
+
+// get route which takes ?userId=2, then will delete all users greater than or equal 2, also delete all order and transacations
+app.get("/delete", async (req, res) => {
+  const userId = req.query.userId;
+  if (userId == 1) {
+    res.send("Cannot delete admin");
+    return;
+  }
+  try {
+    await User.deleteMany({ userId: { $gte: userId } });
+    await Order.deleteMany({ userId: { $gte: userId } });
+    await Transaction.deleteMany({
+      $or: [{ fromId: userId }, { receiverId: userId }],
+    });
+    res.send("Deleted");
+  } catch (error) {
+    res.send(error);
+  }
 });
 
 // Routes
@@ -117,7 +139,6 @@ listenToEvents();
 // getCurrentSlot("0x91fBa4A117dC5B356901Ee88d708432636995403").then((data) =>
 //   console.log("getUserSlot", data)
 // );
-
 
 // upgradeUserSlot("0x105E18D685d22eDF2d7a3dEb50a3A37F26E1C88D", 10).then((data) =>
 //   console.log(data)

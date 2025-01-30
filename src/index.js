@@ -69,6 +69,10 @@ app.get("/", (req, res) => {
 // get route which takes ?userId=2, then will delete all users greater than or equal 2, also delete all order and transacations
 app.get("/delete", async (req, res) => {
   const userId = req.query.userId;
+  if (userId == 1) {
+    res.send("Cannot delete admin");
+    return;
+  }
   try {
     await User.deleteMany({ userId: { $gte: userId } });
     await Order.deleteMany({ userId: { $gte: userId } });

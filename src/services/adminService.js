@@ -11,6 +11,7 @@ const {
   purchasePause,
   purchaseUnpause,
   getUserSlot,
+  getBSCFees,
 } = require("../controllers/bookingContractController");
 // take walletAddress and fullName also page and limit
 const getAllUsersService = async (
@@ -86,9 +87,12 @@ const getSettingsStatus = async () => {
   try {
     const isRegistrationPaused = await isPaused();
     const isPurchasingPaused = await isPurchasePaused();
+    const fees = await getBSCFees();
+    console.log(fees, "fees");
     return {
       isRegistrationPaused: isRegistrationPaused.data,
       isPurchasingPaused: isPurchasingPaused.data,
+      fees: fees,
     };
   } catch (error) {
     console.error("Error fetching settings:", error);

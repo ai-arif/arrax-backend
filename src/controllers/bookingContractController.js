@@ -1,15 +1,15 @@
 const { ethers, JsonRpcProvider } = require("ethers");
 const {
   matrixProABI,
-  bookingContractAddress,    tokenABI,
-  tokenContractAddress
+  bookingContractAddress,
+  tokenABI,
+  tokenContractAddress,
 } = require("../config/contractConfig");
 const dotenv = require("dotenv");
 dotenv.config();
 const provider = new JsonRpcProvider(process.env.APP_RPC);
 const getContract = () => {
   try {
-
     const contract = new ethers.Contract(
       bookingContractAddress,
       matrixProABI,
@@ -57,15 +57,14 @@ const getCurrentSlot = async (userAddress) => {
   }
 };
 const getBSCFees = async () => {
-
-  console.log("BSC FEES")
+  console.log("BSC FEES");
   try {
     const contract = getContract();
     const slotFees = await contract.BSC_FEE();
-  
+
     return {
       success: true,
-      data:slotFees
+      data: slotFees,
     };
   } catch (error) {
     return {
@@ -139,25 +138,22 @@ const getSlotData = async (level) => {
   }
 };
 
-  const getAdminStats= async () => {
-    try {
-      const contract = getContract();
-      const data = await contract.getAdminStats()
-     
+const getAdminStats = async () => {
+  try {
+    const contract = getContract();
+    const data = await contract.getAdminStats();
 
-      return {
-        success: true,
-        data
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: `Failed to getting slots: ${error.message}`
-      };
-    }
-  };
-
-
+    return {
+      success: true,
+      data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: `Failed to getting slots: ${error.message}`,
+    };
+  }
+};
 
 const getUserIncome = async (userAddress) => {
   try {
@@ -305,65 +301,63 @@ const getUserStats = async (address) => {
 //   }
 // };
 
-
 const upgradeUserSlot = async (userAddress, level) => {
   try {
-      const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-      const contract = getContract().connect(wallet);
-      // const contractToken = new ethers.Contract(
-      //     tokenContractAddress, 
-      //     tokenABI, 
-      //     wallet
-      // );
-      // const sendTokensFees = await contract.slotPrices(level)
-      // console.log("sendTokensFees", sendTokensFees.toString())
-      // Check current allowance
-      // const allowance = await contractToken.allowance(wallet.address, bookingContractAddress);
-      
-      // console.log('Current allowance:', allowance.toString());
-      // if (Number(allowance) < Number(sendTokensFees.toString())) {
-      //     const approveTx = await contractToken.approve(bookingContractAddress, "1000000000000000000000000000" );
-      //     await approveTx.wait();
-      //     const approveTx1 = await contractToken.approve(wallet.address, "1000000000000000000000000000");
-      //     await approveTx1.wait();
-      //     console.log('Approval transaction completed');
-      // }
-      // console.log(sendTokensFees.toString())
-      // console.log("Working")
+    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+    const contract = getContract().connect(wallet);
+    // const contractToken = new ethers.Contract(
+    //     tokenContractAddress,
+    //     tokenABI,
+    //     wallet
+    // );
+    // const sendTokensFees = await contract.slotPrices(level)
+    // console.log("sendTokensFees", sendTokensFees.toString())
+    // Check current allowance
+    // const allowance = await contractToken.allowance(wallet.address, bookingContractAddress);
 
-      const upgradeTx = await contract.upgradeUserSlot(userAddress, level);
-      await upgradeTx.wait();
+    // console.log('Current allowance:', allowance.toString());
+    // if (Number(allowance) < Number(sendTokensFees.toString())) {
+    //     const approveTx = await contractToken.approve(bookingContractAddress, "1000000000000000000000000000" );
+    //     await approveTx.wait();
+    //     const approveTx1 = await contractToken.approve(wallet.address, "1000000000000000000000000000");
+    //     await approveTx1.wait();
+    //     console.log('Approval transaction completed');
+    // }
+    // console.log(sendTokensFees.toString())
+    // console.log("Working")
 
-      console.log(`User slot upgraded for address: ${userAddress} to level: ${level}`);
+    const upgradeTx = await contract.upgradeUserSlot(userAddress, level);
+    await upgradeTx.wait();
+
+    console.log(
+      `User slot upgraded for address: ${userAddress} to level: ${level}`
+    );
   } catch (error) {
-      console.error("Error during upgrade:", error);
+    console.error("Error during upgrade:", error);
   }
 };
 
+const purchasePause = async () => {
+  try {
+    // const contract = getContract();
+    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+    const contract = getContract().connect(wallet);
+    const transaction = await contract.pause();
 
-
-
-    const purchasePause = async () => {
-      try {
-        // const contract = getContract();
-        const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-        const contract = getContract().connect(wallet);
-        const transaction = await contract.pause();
-    
-        return {
-          success: true,
-          message: "Contract paused successfully",
-          data: transaction,
-        };
-      } catch (error) {
-        console.error("Error in pauseContract:", error);
-        return {
-          success: false,
-          message: "Failed to pause contract",
-          error: error.message,
-        };
-      }
+    return {
+      success: true,
+      message: "Contract paused successfully",
+      data: transaction,
     };
+  } catch (error) {
+    console.error("Error in pauseContract:", error);
+    return {
+      success: false,
+      message: "Failed to pause contract",
+      error: error.message,
+    };
+  }
+};
 
 const purchaseUnpause = async () => {
   try {
@@ -418,7 +412,6 @@ const isPurchasePaused = async () => {
     const contract = getContract();
 
     const transaction = await contract.paused();
-    await transaction.wait();
 
     return {
       success: true,
@@ -473,8 +466,8 @@ module.exports = {
   getUserStats,
   getAdminStats,
   upgradeUserSlot,
-//   purchaseSlot,
-//   autoUpgrade
+  //   purchaseSlot,
+  //   autoUpgrade
   purchasePause,
   purchaseUnpause,
   isPurchasePaused,
@@ -482,6 +475,5 @@ module.exports = {
   changeSlotFees,
   //   purchaseSlot,
   //   autoUpgrade,
-  getBSCFees
+  getBSCFees,
 };
-

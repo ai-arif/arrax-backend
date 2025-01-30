@@ -7,6 +7,7 @@ const {
   updateRegistration,
   updatePurchasing,
   upgradeUserSlotController,
+  updateFeesController,
 } = require("../controllers/adminController");
 // get all users,
 router.get("/users", getAllUsers);
@@ -18,6 +19,8 @@ router.get("/settings", getSettings);
 router.put("/update-registration", updateRegistration);
 // update purchasing status
 router.put("/update-purchasing", updatePurchasing);
+// update fees
+router.put("/update-fees", updateFeesController);
 
 // upgrade user slot
 router.post("/upgrade-user-slot", upgradeUserSlotController);

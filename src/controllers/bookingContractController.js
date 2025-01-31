@@ -387,9 +387,9 @@ const changeSlotFees = async (feesAmount) => {
     // const contract = getContract();
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
     const contract = getContract().connect(wallet);
-    const fees = feesAmount * 10 ** 18;
-    console.log("fees", fees);
-    const transaction = await contract.updateBscFeeWallet(fees);
+    // const fees = feesAmount * 10 ** 18;
+    console.log("fees", feesAmount);
+    const transaction = await contract.updateBscFee(feesAmount);
     await transaction.wait();
 
     return {

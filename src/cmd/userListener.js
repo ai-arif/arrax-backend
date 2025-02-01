@@ -26,6 +26,7 @@ async function userListener() {
       referrerAddress
       // fullName
     ) => {
+      console.log("Event Started...");
       console.log("userAddress", userAddress);
       console.log("userId", userId);
       console.log("Normal userId", new BN(userId).toNumber());

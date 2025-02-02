@@ -224,7 +224,7 @@ const processImage = async (buffer, userId, fullName) => {
     if (fullName) updateData.fullName = fullName;
 
     if (Object.keys(updateData).length > 0) {
-      await User.update(updateData, { where: { userId } });
+      await User.updateOne({ userId }, { $set: updateData });
     }
 
     return publicUrl;

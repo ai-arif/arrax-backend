@@ -102,22 +102,23 @@ const getUserGenerationLevels = async (req, res) => {
 
 const uploadImage = async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
+    const { fullName } = req.body;
+    let processedImagePath = null;
 
-    // Process the image
-    const processedImagePath = await processImage(req.file.buffer, req.user);
+    // Pass fullName along with image processing
+    processedImagePath = await processImage(
+      req.file ? req.file.buffer : null,
+      req.user.userId,
+      fullName
+    );
 
-    res.status(200).json({
-      message: "Image uploaded and processed successfully",
-      processedImage: processedImagePath,
+    return sendResponse(res, 200, true, "Profile updated successfully", {
+      image: processedImagePath,
+      fullName: fullName || req.user.fullName,
     });
   } catch (error) {
     console.error(error.message);
-    res
-      .status(500)
-      .json({ message: "Failed to upload and process the image." });
+    return sendResponse(res, 500, false, error.message, null);
   }
 };
 

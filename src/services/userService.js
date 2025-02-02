@@ -199,25 +199,33 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const processImage = async (buffer, user) => {
+const processImage = async (buffer, userId, fullName) => {
   try {
-    console.log("Processing image...");
+    let processedPath = null;
 
-    // Generate processed image path
-    const processedPath = path.join(uploadDir, `processed-${Date.now()}.webp`);
+    if (buffer) {
+      // Generate processed image path
+      processedPath = path.join(uploadDir, `processed-${Date.now()}.webp`);
 
-    // Use Sharp to process the image
-    await sharp(buffer)
-      .resize(800) // Resize image to 800px width (maintaining aspect ratio)
-      .toFormat("webp") // Convert to webp format
-      .toFile(processedPath);
+      // Use Sharp to process the image
+      await sharp(buffer)
+        .resize(800) // Resize image to 800px width (maintaining aspect ratio)
+        .toFormat("webp") // Convert to webp format
+        .toFile(processedPath);
+    }
 
-    const publicUrl = `${process.env.APP_URL}/uploads/${path.basename(
-      processedPath
-    )}`;
-    // Update the user's image field
-    user.image = publicUrl;
-    await user.save();
+    const publicUrl = processedPath
+      ? `${process.env.APP_URL}/uploads/${path.basename(processedPath)}`
+      : null;
+
+    // Update user data in DB
+    const updateData = {};
+    if (publicUrl) updateData.image = publicUrl;
+    if (fullName) updateData.fullName = fullName;
+
+    if (Object.keys(updateData).length > 0) {
+      await User.update(updateData, { where: { userId } });
+    }
 
     return publicUrl;
   } catch (error) {

@@ -98,7 +98,6 @@ const insertSlotInfo = async ({ user, level }) => {
 
 const upgradeAnotherUserSlot = async (userAddress, level) => {
   try {
-    console.log("received this", userAddress, level);
     const user = await User.findOne({ walletAddress: userAddress });
     if (!user) {
       throw new Error("User not found");

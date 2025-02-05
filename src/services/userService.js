@@ -55,32 +55,34 @@ const loginOrRegisterUser = async ({
   referrerAddress,
 }) => {
   try {
-    console.log(
-      "userId",
-      userId,
-      walletAddress,
-      fullName,
-      referredBy,
-      referrerAddress
-    );
+    // console.log(
+    //   "userId Register *** ",
+    //   userId,
+    //   walletAddress,
+    //   fullName,
+    //   referredBy,
+    //   referrerAddress
+    // );
     let user = await User.findOne({ walletAddress });
+  
     if (user) {
       const token = generateToken({
         userId: user.userId,
         walletAddress: user.walletAddress,
         roles: user?.roles,
       });
-      console.log("getting user income");
+      // console.log("getting user income");
       const incomeData = await getUserIncome(walletAddress);
-      console.log("getting user stats");
+      // console.log("getting user stats");
       // const userStats = await getUserStats(walletAddress);
 
       user.income = {
         ...user.income,
         ...incomeData.data,
       };
-      console.log("income", user.income);
+ 
       await user.save();
+ 
       return { user, token, isNewUser: false };
     }
 
@@ -100,16 +102,21 @@ const loginOrRegisterUser = async ({
     // Generate a new user ID
     // const nextUserId = await getNextSequence("userId");
 
-    // Create the new user
-    user = await User.create({
-      userId,
-      fullName,
-      walletAddress,
-      referredBy,
-      referrerAddress,
-      isOwner: false,
-      currentActiveSlot: 0,
-    });
+    // Create the new user 
+    // if(!user){
+      user = await User.create({
+        userId,
+        fullName,
+        walletAddress,
+        referredBy,
+        referrerAddress,
+        isOwner: false,
+        currentActiveSlot: 0,
+      });
+    // }
+
+
+    console.log("user registered successfully", user);
 
     // Update the referrer's direct referrals and total team count
     // referrer.directReferrals.push(user.userId);

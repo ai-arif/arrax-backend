@@ -93,9 +93,9 @@ const loginOrRegisterUser = async ({
 
     // Validate the referral ID
     const referrer = await User.findOne({ userId: referredBy });
-    if (!referrer) {
-      throw new Error("Invalid referral ID.");
-    }
+    // if (!referrer) {
+    //   throw new Error("Invalid referral ID.");
+    // }
 
     // Generate a new user ID
     // const nextUserId = await getNextSequence("userId");

@@ -18,17 +18,7 @@ const {
 } = require("./controllers/RegisterationContractController");
 const { listenToEvents, getEventLogs } = require("./cmd/matrixListener");
 const { BN } = require("bn.js");
-const {
-  getUserSlot,
 
-  upgradeUserSlot,
-  getUserActiveSlots,
-  getUserStats,
-  getLevelReferralDetails,
-  getMatrixInfo,
-  getUserReferralStats,
-  getCurrentSlot,
-} = require("./controllers/bookingContractController");
 const User = require("./models/User");
 const Order = require("./models/Order");
 const Transaction = require("./models/Transaction");
@@ -101,7 +91,7 @@ app.listen(port, () => {
 
 // getUserInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd")
 listenToEvents();
-scheduleUserSync()
+scheduleUserSync();
 // handleMissingUsers().then((e)=>console.log(e))
 
 // getEventLogs()

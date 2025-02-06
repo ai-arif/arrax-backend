@@ -37,13 +37,14 @@ const handleMissingUsers = async () => {
       const user = await contract.getUserByUserId(i);
       if (user) {
         count++;
-        console.log({
-          walletAddress: user[0],
-          userId: i,
-          fullName: user[6] ? user[6] : "Unknown",
-          referredBy: user[1].toString(),
-          referrerAddress: user[2],
-        });
+        console.log("userId", i);
+        // console.log({
+        //   walletAddress: user[0],
+        //   userId: i,
+        //   fullName: user[6] ? user[6] : "Unknown",
+        //   referredBy: user[1].toString(),
+        //   referrerAddress: user[2],
+        // });
         try {
           await loginOrRegisterUser({
             walletAddress: user[0],

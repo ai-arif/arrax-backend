@@ -112,7 +112,6 @@ const upgradeAnotherUserSlot = async (userAddress, level) => {
     const currentSlot = await getUserSlot(userAddress);
     const activeSlot = currentSlot?.activeSlot;
     user.currentActiveSlot = activeSlot;
-    console.log("current active slot", activeSlot);
     await user.save();
 
     const currentLevel = Number(level);
@@ -138,8 +137,8 @@ const upgradeAnotherUserSlot = async (userAddress, level) => {
       }, // Data to update or insert
       { new: true, upsert: true } // Return the updated document and create if it doesn't exist
     );
-    console.log("Slot information upserted successfully");
-    console.log(slot);
+    console.log("Slot information upserted successfully", slot?._id);
+
     if (user.referredBy !== null) {
       const referrearUser = await User.findOne({
         userId: user.referredBy,
@@ -167,8 +166,10 @@ const upgradeAnotherUserSlot = async (userAddress, level) => {
           }, // Data to update or insert
           { new: true, upsert: true } // Return the updated document and create if it doesn't exist
         );
-        console.log("Referral Slot information upserted successfully");
-        console.log(referralSlot);
+        console.log(
+          "Referral Slot information upserted successfully",
+          referralSlot?._id
+        );
       }
     }
     return slot;

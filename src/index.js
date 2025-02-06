@@ -25,6 +25,8 @@ const Transaction = require("./models/Transaction");
 const { handleMissingUsers } = require("./cmd/runner");
 const job = require("./cmd/runner");
 const scheduleUserSync = require("./cmd/runner");
+const { scheduleDailyReset } = require("./cmd/resetDailyStats");
+
 // const { getSlotInfo } = require("./controllers/bookingContractController");
 const morganFormat =
   ":method :url :status :res[content-length] - :response-time ms";
@@ -92,6 +94,7 @@ app.listen(port, () => {
 // getUserInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd")
 listenToEvents();
 scheduleUserSync();
+scheduleDailyReset();
 // handleMissingUsers().then((e)=>console.log(e))
 
 // getEventLogs()

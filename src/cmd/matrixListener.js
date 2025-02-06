@@ -124,12 +124,12 @@ const listenToEvents = () => {
   console.log("Listening for Matrix events...");
 
   contract.on("SlotPurchased", async (user, level, price, event) => {
-    console.log("New Slot Purchase:", {
-      user,
-      level: level.toString(),
-      price: ethers.formatEther(price),
-      // transactionHash: event.transactionHash,
-    });
+    // console.log("New Slot Purchase:", {
+    //   user,
+    //   level: level.toString(),
+    //   price: ethers.formatEther(price),
+
+    // });
     console.log("inserting order info");
     await insertOrderInfo({
       user,
@@ -138,8 +138,6 @@ const listenToEvents = () => {
       // transactionHash: event.transactionHash,
     });
     await insertSlotInfo({ user, level });
-    
-
   });
 
   contract.on("MatrixComplete", (user, level, event) => {
@@ -162,14 +160,13 @@ const listenToEvents = () => {
   contract.on(
     "RewardDistributed",
     async (user, from, amount, level, incomeType, event) => {
-      console.log("Reward Distributed:", {
-        user,
-        from,
-        amount: ethers.formatEther(amount),
-        level: level.toString(),
-        incomeType,
-        // transactionHash: event.transactionHash,
-      });
+      // console.log("Reward Distributed:", {
+      //   user,
+      //   from,
+      //   amount: ethers.formatEther(amount),
+      //   level: level.toString(),
+      //   incomeType,
+      // });
       await insertTransaction({
         user,
         from,
@@ -178,20 +175,18 @@ const listenToEvents = () => {
         incomeType,
         // transactionHash: event.transactionHash,
       });
-
     }
   );
 
   contract.on(
     "SlotPositionUpdated",
     (user, level, position, entryTime, event) => {
-      console.log("Slot Position Updated:", {
-        user,
-        level: level.toString(),
-        position: position.toString(),
-        entryTime: entryTime.toString(),
-        // transactionHash: event.transactionHash,
-      });
+      // console.log("Slot Position Updated:", {
+      //   user,
+      //   level: level.toString(),
+      //   position: position.toString(),
+      //   entryTime: entryTime.toString(),
+      // });
     }
   );
 

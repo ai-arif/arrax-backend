@@ -37,7 +37,7 @@ const insertTransaction = async ({
       { new: true, upsert: true } // Create if not found, return the updated document
     );
     console.log("Transaction inserted successfully:", transaction);
-    console.log("got amount", amount);
+    // console.log("got amount", amount);
 
     const receiverIncome = await getUserIncome(userInfo?.walletAddress);
     const fromIncome = await getUserIncome(fromUser?.walletAddress);

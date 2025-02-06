@@ -30,14 +30,14 @@ const getCurrentSlot = async (userAddress) => {
   try {
     const contract = getContract();
     const slotInfo = await contract.getCurrentSlotInfo(userAddress);
-    console.log("getCurrentSlot", {
-      currentActiveSlot: slotInfo[0].toString(),
-      currentPosition: slotInfo[1].toString(),
-      entryTime: slotInfo[2].toString(),
-      matrixSize: slotInfo[3].toString(),
-      recycleCount: slotInfo[4].toString(),
-      timeInPosition: slotInfo[5].toString(),
-    });
+    // console.log("getCurrentSlot", {
+    //   currentActiveSlot: slotInfo[0].toString(),
+    //   currentPosition: slotInfo[1].toString(),
+    //   entryTime: slotInfo[2].toString(),
+    //   matrixSize: slotInfo[3].toString(),
+    //   recycleCount: slotInfo[4].toString(),
+    //   timeInPosition: slotInfo[5].toString(),
+    // });
     return {
       success: true,
       data: {
@@ -57,7 +57,7 @@ const getCurrentSlot = async (userAddress) => {
   }
 };
 const getBSCFees = async () => {
-  console.log("BSC FEES");
+  // console.log("BSC FEES");
   try {
     const contract = getContract();
     const slotFees = await contract.BSC_FEE();
@@ -117,11 +117,11 @@ const getSlotData = async (level) => {
     const contract = getContract();
     const data = await contract.slots(level);
 
-    console.log("getSlotData", {
-      level: data[0].toString(),
-      recycleCount: data[2],
-      transactions: data[3].toString(),
-    });
+    // console.log("getSlotData", {
+    //   level: data[0].toString(),
+    //   recycleCount: data[2],
+    //   transactions: data[3].toString(),
+    // });
     return {
       success: true,
       data: {
@@ -206,7 +206,7 @@ const getMatrixInfo = async (level) => {
   try {
     const contract = getContract();
     const info = await contract.getMatrixInfo(level);
-    console.log("getMatrixInfo", info);
+    // console.log("getMatrixInfo", info);
     return {
       success: true,
       data: {
@@ -388,7 +388,7 @@ const changeSlotFees = async (feesAmount) => {
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
     const contract = getContract().connect(wallet);
     // const fees = feesAmount * 10 ** 18;
-    console.log("fees", feesAmount);
+
     const transaction = await contract.updateBscFee(feesAmount);
     await transaction.wait();
 

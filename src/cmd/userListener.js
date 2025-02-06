@@ -80,7 +80,7 @@ async function userListener() {
             referrerAddress,
           });
 
-          console.log("✅ User saved:", user);
+          console.log("✅ User saved:", user?.userId);
         } catch (error) {
           console.error("❌ Error saving user to database:", error);
         }

@@ -22,6 +22,9 @@ const userSchema = new mongoose.Schema(
     activeTeam: { type: Number, default: 0 }, // Total active users under this user
     dailyIncome: { type: Number, default: 0 }, // Daily income
     dailyJoining: { type: Number, default: 0 }, // Daily joining
+    dailyTeam: { type: Number, default: 0 },
+    dailyPartners: { type: Number, default: 0 },
+    dailyActivePartners: { type: Number, default: 0 },
     currentActiveSlot: { type: Number, default: 0 }, // Current active slot
     roles: {
       type: [String],

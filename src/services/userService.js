@@ -3,19 +3,11 @@ const path = require("path");
 const fs = require("fs");
 const User = require("../models/User");
 const Slot = require("../models/Slot");
-const SubSlot = require("../models/SubSlot");
 const { generateToken } = require("./tokenService");
-const {
-  getUserSlot,
-  getLevelReferralDetails,
-  getAdminStats,
-} = require("../controllers/bookingContractController");
-const getNextSequence = require("../utils/getNextSequence");
-const {
-  getUserIncome,
-  getUserStats,
-} = require("../controllers/bookingContractController");
-const { insertOrderInfo } = require("./orderService");
+const { getUserSlot } = require("../controllers/bookingContractController");
+// const getNextSequence = require("../utils/getNextSequence");
+const { getUserIncome } = require("../controllers/bookingContractController");
+// const { insertOrderInfo } = require("./orderService");
 
 const registerOwner = async ({ walletAddress, fullName }) => {
   const existingOwner = await User.findOne({ isOwner: true });
@@ -55,16 +47,8 @@ const loginOrRegisterUser = async ({
   referrerAddress,
 }) => {
   try {
-    // console.log(
-    //   "userId Register *** ",
-    //   userId,
-    //   walletAddress,
-    //   fullName,
-    //   referredBy,
-    //   referrerAddress
-    // );
     let user = await User.findOne({ walletAddress });
-  
+
     if (user) {
       const token = generateToken({
         userId: user.userId,
@@ -80,9 +64,9 @@ const loginOrRegisterUser = async ({
         ...user.income,
         ...incomeData.data,
       };
- 
+
       await user.save();
- 
+
       return { user, token, isNewUser: false };
     }
 
@@ -95,26 +79,16 @@ const loginOrRegisterUser = async ({
 
     // Validate the referral ID
     const referrer = await User.findOne({ userId: referredBy });
-    // if (!referrer) {
-    //   throw new Error("Invalid referral ID.");
-    // }
 
-    // Generate a new user ID
-    // const nextUserId = await getNextSequence("userId");
-
-    // Create the new user 
-    // if(!user){
-      user = await User.create({
-        userId,
-        fullName,
-        walletAddress,
-        referredBy,
-        referrerAddress,
-        isOwner: false,
-        currentActiveSlot: 0,
-      });
-    // }
-
+    user = await User.create({
+      userId,
+      fullName,
+      walletAddress,
+      referredBy,
+      referrerAddress,
+      isOwner: false,
+      currentActiveSlot: 0,
+    });
 
     console.log("user registered successfully", user);
 
@@ -122,6 +96,8 @@ const loginOrRegisterUser = async ({
     // referrer.directReferrals.push(user.userId);
     referrer.totalTeam += 1;
     referrer.totalPartners += 1;
+    referrer.dailyTeam += 1;
+    referrer.dailyPartners += 1;
 
     await referrer.save();
     updateReferrerTeam(referredBy, 1);
@@ -145,6 +121,7 @@ const updateReferrerTeam = async (userId, team) => {
   while (user.referredBy !== null) {
     user = await User.findOne({ userId: user.referredBy });
     user.totalTeam += team;
+    user.dailyPartners += team;
     await user.save();
   }
 };

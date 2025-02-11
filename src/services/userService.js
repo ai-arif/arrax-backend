@@ -106,18 +106,6 @@ const loginOrRegisterUser = async ({
         const userIdGot = new BN(userData[0]).toNumber();
         const referrerBy = new BN(userData[1]).toNumber();
         const referrerAddress = userData[2];
-        // console.log("Full name", fullName);
-        // console.log("userId", userId);
-        // console.log("referredBy", referrerBy);
-        // console.log("referrerAddress", referrerAddress);
-        const referrer = await User.findOne({ userId: referredBy });
-        referrer.totalTeam += 1;
-        referrer.totalPartners += 1;
-        referrer.dailyTeam += 1;
-        referrer.dailyPartners += 1;
-
-        await referrer.save();
-        updateReferrerTeam(referredBy, 1);
 
         user = await User.create({
           userId: userIdGot,
@@ -132,6 +120,16 @@ const loginOrRegisterUser = async ({
           userId: user.userId,
           walletAddress: user.walletAddress,
         });
+        const referrer = await User.findOne({ userId: referrerBy });
+        if (referrer) {
+          referrer.totalTeam += 1;
+          referrer.totalPartners += 1;
+          referrer.dailyTeam += 1;
+          referrer.dailyPartners += 1;
+          updateReferrerTeam(referrerBy, 1);
+          await referrer.save();
+        }
+
         return { user, token, isNewUser: true };
       } catch (error) {
         throw new Error(error.message);

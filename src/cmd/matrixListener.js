@@ -144,7 +144,6 @@ const listenToEvents = () => {
     console.log("Matrix Complete:", {
       user,
       level: level.toString(),
-      // transactionHash: event.transactionHash,
     });
   });
 

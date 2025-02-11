@@ -146,7 +146,6 @@ const getUserInfo = async (userAddress) => {
   try {
     const contract = getContract();
     const user = await contract.getUserInfo(userAddress);
-    console.log(user);
 
     if (!user || user === "0x") {
       return {

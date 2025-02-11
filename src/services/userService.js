@@ -1,13 +1,43 @@
+require("dotenv").config();
 const sharp = require("sharp");
+const { ethers, JsonRpcProvider } = require("ethers");
+const contractAddress = process.env.NEXT_PUBLIC_REGISTRATION_CONTRACT_ADDRESS;
+const BN = require("bn.js");
+const rpcURL = process.env.APP_RPC;
+const provider = new JsonRpcProvider(rpcURL);
+
 const path = require("path");
 const fs = require("fs");
 const User = require("../models/User");
 const Slot = require("../models/Slot");
 const { generateToken } = require("./tokenService");
 const { getUserSlot } = require("../controllers/bookingContractController");
+const contractABI = require("../../ABI/registration.json");
 // const getNextSequence = require("../utils/getNextSequence");
 const { getUserIncome } = require("../controllers/bookingContractController");
+const {
+  getUserInfo,
+  getUserByUserId,
+} = require("../controllers/RegisterationContractController");
 // const { insertOrderInfo } = require("./orderService");
+
+const getContract = () => {
+  try {
+    const contract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      provider
+    );
+    return contract;
+  } catch (error) {
+    console.log("Error initializing contract:", error);
+    return {
+      success: false,
+      message: "Contract initialization failed",
+      error: error.message,
+    };
+  }
+};
 
 const registerOwner = async ({ walletAddress, fullName }) => {
   const existingOwner = await User.findOne({ isOwner: true });
@@ -55,7 +85,7 @@ const loginOrRegisterUser = async ({
         walletAddress: user.walletAddress,
         roles: user?.roles,
       });
-      // console.log("getting user income");
+
       const incomeData = await getUserIncome(walletAddress);
       // console.log("getting user stats");
       // const userStats = await getUserStats(walletAddress);
@@ -68,47 +98,45 @@ const loginOrRegisterUser = async ({
       await user.save();
 
       return { user, token, isNewUser: false };
+    } else {
+      try {
+        const userInfo = await getUserInfo(walletAddress);
+        const userData = userInfo.data;
+        const fullNameGot = userData[6];
+        const userIdGot = new BN(userData[0]).toNumber();
+        const referrerBy = new BN(userData[1]).toNumber();
+        const referrerAddress = userData[2];
+        // console.log("Full name", fullName);
+        // console.log("userId", userId);
+        // console.log("referredBy", referrerBy);
+        // console.log("referrerAddress", referrerAddress);
+        const referrer = await User.findOne({ userId: referredBy });
+        referrer.totalTeam += 1;
+        referrer.totalPartners += 1;
+        referrer.dailyTeam += 1;
+        referrer.dailyPartners += 1;
+
+        await referrer.save();
+        updateReferrerTeam(referredBy, 1);
+
+        user = await User.create({
+          userId: userIdGot,
+          fullName: fullNameGot,
+          walletAddress,
+          referredBy,
+          referrerAddress,
+          isOwner: false,
+          currentActiveSlot: 0,
+        });
+        const token = generateToken({
+          userId: user.userId,
+          walletAddress: user.walletAddress,
+        });
+        return { user, token, isNewUser: true };
+      } catch (error) {
+        throw new Error(error.message);
+      }
     }
-
-    // Registration logic for new users
-    if (!referredBy || !fullName) {
-      throw new Error(
-        "Full name and referral ID are required for registration."
-      );
-    }
-
-    // Validate the referral ID
-    const referrer = await User.findOne({ userId: referredBy });
-
-    user = await User.create({
-      userId,
-      fullName,
-      walletAddress,
-      referredBy,
-      referrerAddress,
-      isOwner: false,
-      currentActiveSlot: 0,
-    });
-
-    console.log("user registered successfully", user);
-
-    // Update the referrer's direct referrals and total team count
-    // referrer.directReferrals.push(user.userId);
-    referrer.totalTeam += 1;
-    referrer.totalPartners += 1;
-    referrer.dailyTeam += 1;
-    referrer.dailyPartners += 1;
-
-    await referrer.save();
-    updateReferrerTeam(referredBy, 1);
-
-    // Generate a token for the new user
-    const token = generateToken({
-      userId: user.userId,
-      walletAddress: user.walletAddress,
-    });
-
-    return { user, token, isNewUser: true };
   } catch (error) {
     console.error("Error registering user:", error.message);
     throw error;

@@ -45,7 +45,7 @@ async function userListener() {
           if (!userData || userData.length < 7) {
             throw new Error("Invalid user data returned from contract.");
           }
-          console.log("✅ Fetched user data:", userData);
+          // console.log("✅ Fetched user data:", userData);
         } catch (error) {
           console.error("❌ Error fetching user data from contract:", error);
           return;
@@ -55,7 +55,7 @@ async function userListener() {
         let referrerInfo;
         try {
           referrerInfo = await getUserInfo(referrerAddress);
-          console.log("✅ Fetched referrer info:", referrerInfo);
+          // console.log("✅ Fetched referrer info:", referrerInfo);
         } catch (error) {
           console.error("❌ Error fetching referrer info:", error);
           referrerInfo = { data: [0] }; // Default to no referrer

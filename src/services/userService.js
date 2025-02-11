@@ -96,16 +96,26 @@ const loginOrRegisterUser = async ({
       };
 
       await user.save();
+      console.log("User Logged in", user.userId);
 
       return { user, token, isNewUser: false };
     } else {
       try {
+        console.log("going to register user", walletAddress);
         const userInfo = await getUserInfo(walletAddress);
         const userData = userInfo.data;
         const fullNameGot = userData[6];
         const userIdGot = new BN(userData[0]).toNumber();
         const referrerBy = new BN(userData[1]).toNumber();
         const referrerAddress = userData[2];
+
+        console.log("user with these data from blockchain", {
+          userIdGot,
+          fullNameGot,
+          walletAddress,
+          referrerBy,
+          referrerAddress,
+        });
 
         user = await User.create({
           userId: userIdGot,
@@ -116,13 +126,7 @@ const loginOrRegisterUser = async ({
           isOwner: false,
           currentActiveSlot: 0,
         });
-        console.log("user with these data from blockchain", {
-          userIdGot,
-          fullNameGot,
-          walletAddress,
-          referrerBy,
-          referrerAddress,
-        });
+
         const token = generateToken({
           userId: user.userId,
           walletAddress: user.walletAddress,

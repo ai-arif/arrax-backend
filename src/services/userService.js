@@ -111,10 +111,17 @@ const loginOrRegisterUser = async ({
           userId: userIdGot,
           fullName: fullNameGot,
           walletAddress,
-          referredBy,
+          referrerBy,
           referrerAddress,
           isOwner: false,
           currentActiveSlot: 0,
+        });
+        console.log("user with these data from blockchain", {
+          userIdGot,
+          fullNameGot,
+          walletAddress,
+          referrerBy,
+          referrerAddress,
         });
         const token = generateToken({
           userId: user.userId,

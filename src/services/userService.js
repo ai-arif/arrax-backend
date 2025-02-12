@@ -121,7 +121,7 @@ const loginOrRegisterUser = async ({
           userId: userIdGot,
           fullName: fullNameGot,
           walletAddress,
-          referrerBy,
+          referredBy: referrerBy,
           referrerAddress,
           isOwner: false,
           currentActiveSlot: 0,

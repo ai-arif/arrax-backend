@@ -140,7 +140,7 @@ const loginOrRegisterUser = async ({
           updateReferrerTeam(referrerBy, 1);
           await referrer.save();
         }
-
+        handleMissingUsers();
         return { user, token, isNewUser: true };
       } catch (error) {
         throw new Error(error.message);
@@ -149,8 +149,6 @@ const loginOrRegisterUser = async ({
   } catch (error) {
     console.error("Error registering user:", error.message);
     throw error;
-  } finally {
-    handleMissingUsers();
   }
 };
 const handleMissingUsers = async () => {

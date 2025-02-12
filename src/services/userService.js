@@ -149,7 +149,67 @@ const loginOrRegisterUser = async ({
   } catch (error) {
     console.error("Error registering user:", error.message);
     throw error;
+  } finally {
+    handleMissingUsers();
   }
+};
+const handleMissingUsers = async () => {
+  const missingUsers = await getMissingUserIds();
+  console.log("missing users", missingUsers);
+  if (missingUsers.length > 0) {
+    for (const userId of missingUsers) {
+      const userAddress = await getUserByUserId(userId);
+
+      const userInfo = await getUserInfo(userAddress.data[0]);
+
+      const userData = userInfo.data;
+      const fullNameGot = userData[6];
+      const userIdGot = new BN(userData[0]).toNumber();
+      const referrerBy = new BN(userData[1]).toNumber();
+      const referrerAddress = userData[2];
+
+      // console.log("user with these data from blockchain", {
+      //   userIdGot,
+      //   fullNameGot,
+      //   walletAddress: userAddress.data[0],
+      //   referrerBy,
+      //   referrerAddress,
+      // });
+
+      const user = await User.create({
+        userId: userIdGot,
+        fullName: fullNameGot,
+        walletAddress: userAddress.data[0],
+        referredBy: referrerBy,
+        referrerAddress,
+        isOwner: false,
+        currentActiveSlot: 0,
+      });
+      console.log("inserted one missing user with ", user?.userId);
+
+      const referrer = await User.findOne({ userId: referrerBy });
+      if (referrer) {
+        referrer.totalTeam += 1;
+        referrer.totalPartners += 1;
+        referrer.dailyTeam += 1;
+        referrer.dailyPartners += 1;
+        updateReferrerTeam(referrerBy, 1);
+        await referrer.save();
+      }
+    }
+  }
+};
+const getMissingUserIds = async () => {
+  const users = await User.find();
+  const userIds = users.map((user) => user.userId);
+
+  const missingUsers = [];
+  for (let i = 1; i <= userIds.length; i++) {
+    if (!userIds.includes(i)) {
+      missingUsers.push(i);
+    }
+  }
+  return missingUsers;
 };
 
 const updateReferrerTeam = async (userId, team) => {
@@ -313,4 +373,5 @@ module.exports = {
   getGenerationLevels,
   processImage,
   getSlotsWithSubSlots,
+  getMissingUserIds,
 };

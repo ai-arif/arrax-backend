@@ -28,6 +28,7 @@ const {
   getAllPartners,
   updateTeamsAndPartners,
 } = require("./services/userService");
+const User = require("./models/User");
 
 // const { getSlotInfo } = require("./controllers/bookingContractController");
 const morganFormat =
@@ -90,6 +91,22 @@ app.get("/update-partners", async (req, res) => {
   return res.json({
     message: "Team and Partners Updated",
   });
+});
+
+app.get("/fix-refferal", async (req, res) => {
+  // get users that doesn't have refferedBy field value
+  const users = await User.find({ referredBy: { $exists: false } }).exec();
+  // loop through the users and update the referredBy field, search with walletAddress: user.referrerAddress and get the userId and update the referredBy field
+  users.forEach(async (user) => {
+    const referrer = await User.findOne({
+      walletAddress: user.referrerAddress,
+    }).exec();
+    if (referrer) {
+      user.referredBy = referrer.userId;
+      await user.save();
+    }
+  });
+  return res.json(users);
 });
 // Routes
 app.use("/api/home", homeRoutes);

@@ -23,7 +23,11 @@ const { handleMissingUsers } = require("./cmd/runner");
 const job = require("./cmd/runner");
 const scheduleUserSync = require("./cmd/runner");
 const { scheduleDailyReset } = require("./cmd/resetDailyStats");
-const { getMissingUserIds } = require("./services/userService");
+const {
+  getMissingUserIds,
+  getAllPartners,
+  updateTeamsAndPartners,
+} = require("./services/userService");
 
 // const { getSlotInfo } = require("./controllers/bookingContractController");
 const morganFormat =
@@ -69,6 +73,24 @@ app.get("/missing-users", async (req, res) => {
   res.json(data);
 });
 
+app.get("/partners", async (req, res) => {
+  const userId = req.query.userId;
+  if (userId) {
+    const data = await getAllPartners(userId);
+    return res.json({
+      total: data.length,
+      data,
+    });
+  } else {
+    return res.json("userId is required");
+  }
+});
+app.get("/update-partners", async (req, res) => {
+  const data = await updateTeamsAndPartners();
+  return res.json({
+    message: "Team and Partners Updated",
+  });
+});
 // Routes
 app.use("/api/home", homeRoutes);
 app.use("/api/users", userRoutes);
@@ -79,7 +101,10 @@ app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 
-// getUserInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd")
+// getUserInfo("0x7bfb305F96E6218acC22f85841961b93d1E9c252").then((data) => {
+//   console.log(data);
+// });
+
 listenToEvents();
 scheduleUserSync();
 scheduleDailyReset();

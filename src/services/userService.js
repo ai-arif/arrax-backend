@@ -212,6 +212,53 @@ const getMissingUserIds = async () => {
   return missingUsers;
 };
 
+const updateTeamsAndPartners = async () => {
+  // Fetch all users from the database
+  const users = await User.find({});
+
+  for (const user of users) {
+    console.log("Updating Teams and Partners for user", user.userId);
+    // Count totalTeam (Direct Referrals)
+    const totalPartners = await User.countDocuments({
+      referredBy: user.userId,
+    });
+    console.log("total team", totalPartners);
+
+    // Get all partners recursively
+    const allPartners = await getAllPartners(user.userId);
+    const totalTeam = allPartners.length;
+
+    // Update user document
+    await User.updateOne(
+      { userId: user.userId },
+      {
+        $set: {
+          totalTeam,
+          totalPartners,
+        },
+      }
+    );
+    console.log("Update Teams and Partners for user", user.userId);
+  }
+};
+
+const getAllPartners = async (userId) => {
+  const directReferrals = await User.find({ referredBy: userId }).select(
+    "userId"
+  );
+  const directIds = directReferrals.map((user) => user.userId);
+
+  let allPartners = [...directIds];
+
+  // Recursively find partners for each direct referral
+  for (let directId of directIds) {
+    const subPartners = await getAllPartners(directId);
+    allPartners = [...allPartners, ...subPartners];
+  }
+
+  // Return unique userIds to avoid duplicates
+  return [...new Set(allPartners)];
+};
 const updateReferrerTeam = async (userId, team) => {
   // loop recursively through the referredBy, and increase everyone's team count, until you reach the owner where referredBy is null
   let user = await User.findOne({ userId });
@@ -322,10 +369,6 @@ const getSlotsWithSubSlots = async (userId) => {
     if (!user) {
       throw new Error("User not found");
     }
-    // if (user?.isOwner) {
-    //   const stats = await getAdminStats();
-    //   console.log("stats getting ", stats);
-    // }
 
     const slotInfo = await getUserSlot(user?.walletAddress);
     const currentSlot = {
@@ -337,24 +380,6 @@ const getSlotsWithSubSlots = async (userId) => {
     const slotDetails = await Slot.find({ userId: user.userId }).sort({
       slot: 1,
     });
-
-    // if (activeSlot > 0) {
-    //   for (let i = 0; i < activeSlot; i++) {
-    //     const levelReferralDetails = await getLevelReferralDetails(
-    //       user.walletAddress,
-    //       i + 1
-    //     );
-
-    //     // Convert BigInt fields to string
-    //     const convertedDetails = JSON.parse(
-    //       JSON.stringify(levelReferralDetails, (_, value) =>
-    //         typeof value === "bigint" ? value.toString() : value
-    //       )
-    //     );
-
-    //     slotDetails.push({ slot: i + 1, data: convertedDetails?.data });
-    //   }
-    // }
 
     // Optionally, add slotDetails to currentSlot for reference
     currentSlot.slotDetails = slotDetails;
@@ -374,4 +399,6 @@ module.exports = {
   processImage,
   getSlotsWithSubSlots,
   getMissingUserIds,
+  getAllPartners,
+  updateTeamsAndPartners,
 };

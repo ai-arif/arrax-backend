@@ -36,9 +36,19 @@ const insertTransaction = async ({
       }, // Data to update or insert
       { new: true, upsert: true } // Create if not found, return the updated document
     );
-    console.log("Transaction inserted successfully:", transaction);
-    // console.log("got amount", amount);
+    // dailyTotalIncome, dailyLevelIncome, dailyDirectIncome, incomeType direct, level
 
+    console.log("Transaction inserted successfully:", transaction);
+    // console.log("got amount", amount)
+    if (incomeType === "direct") {
+      userInfo.dailyDirectIncome = (userInfo.dailyDirectIncome || 0) + amount;
+      // dailyTotalIncome
+      userInfo.dailyTotalIncome = (userInfo.dailyTotalIncome || 0) + amount;
+    }
+    if (incomeType === "level") {
+      userInfo.dailyLevelIncome = (userInfo.dailyLevelIncome || 0) + amount;
+      userInfo.dailyTotalIncome = (userInfo.dailyTotalIncome || 0) + amount;
+    }
     const receiverIncome = await getUserIncome(userInfo?.walletAddress);
     const fromIncome = await getUserIncome(fromUser?.walletAddress);
     userInfo.income = {
@@ -47,11 +57,13 @@ const insertTransaction = async ({
     };
     // update the userInfo isActive to true
     userInfo.isActive = true;
+
     await userInfo.save();
     fromUser.income = {
       ...fromUser.income,
       ...fromIncome.data,
     };
+
     await fromUser.save();
     return transaction;
   } catch (error) {

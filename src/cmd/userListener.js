@@ -24,10 +24,10 @@ async function userListener() {
       "UserRegistered",
       async (userAddress, userId, registrationTime, referrerAddress) => {
         console.log("🔔 Event Received: UserRegistered");
-        console.log("userAddress:", userAddress);
-        console.log("userId:", userId.toString());
-        console.log("registrationTime:", registrationTime.toString());
-        console.log("referrerAddress:", referrerAddress);
+        // console.log("userAddress:", userAddress);
+        // console.log("userId:", userId.toString());
+        // console.log("registrationTime:", registrationTime.toString());
+        // console.log("referrerAddress:", referrerAddress);
 
         // Convert userId to a normal number
         let numericUserId;

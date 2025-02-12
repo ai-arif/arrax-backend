@@ -16,6 +16,9 @@ const resetDailyStats = async () => {
           dailyTeam: 0,
           dailyPartners: 0,
           dailyActivePartners: 0,
+          dailyTotalIncome: 0,
+          dailyLevelIncome: 0,
+          dailyDirectIncome: 0,
         },
       }
     );

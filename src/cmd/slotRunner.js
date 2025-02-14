@@ -34,7 +34,7 @@ const handleMissingEvents = async () => {
     // Get current block number
     const currentBlock = await provider.getBlockNumber();
     // Calculate block range (last 100 blocks or another suitable range)
-    const fromBlock = currentBlock - 5000;
+    const fromBlock = currentBlock - 10000;
 
     const eventFilters = {
       slotPurchased: contract.filters.SlotPurchased(),

@@ -87,9 +87,6 @@ const loginOrRegisterUser = async ({
       });
 
       const incomeData = await getUserIncome(walletAddress);
-      // console.log("getting user stats");
-      // const userStats = await getUserStats(walletAddress);
-
       user.income = {
         ...user.income,
         ...incomeData.data,
@@ -271,6 +268,14 @@ const updateReferrerTeam = async (userId, team) => {
 // get user information by userId
 const getUserById = async (userId) => {
   const user = await User.findOne({ userId });
+  const incomeData = await getUserIncome(user?.walletAddress);
+  user.income = {
+    ...user.income,
+    ...incomeData.data,
+  };
+  console.log("updated income for user", user.userId);
+
+  await user.save();
   return user;
 };
 

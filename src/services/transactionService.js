@@ -15,57 +15,70 @@ const insertTransaction = async ({
     if (!userInfo) {
       throw new Error("User not found");
     }
+
     const fromUser = await User.findOne({ walletAddress: from });
+    if (!fromUser) {
+      throw new Error("From user not found");
+    }
 
-    const transaction = await Transaction.findOneAndUpdate(
+    // Use $setOnInsert so that fields are only set when creating a new document.
+    // Also, use rawResult to check if the document was newly inserted.
+    const result = await Transaction.findOneAndUpdate(
       {
-        receiverId: userInfo?.userId,
-        fromId: fromUser?.userId,
+        receiverId: userInfo.userId,
+        fromId: fromUser.userId,
         amount,
         level,
-      }, // Filter for matching fields
+      },
       {
-        receiverId: userInfo?.userId,
-        receiver: user,
-        from,
-        fromId: fromUser?.userId,
-        amount,
-        level,
-        incomeType,
-        transactionHash,
-      }, // Data to update or insert
-      { new: true, upsert: true } // Create if not found, return the updated document
+        $setOnInsert: {
+          receiverId: userInfo.userId,
+          receiver: user,
+          from,
+          fromId: fromUser.userId,
+          amount,
+          level,
+          incomeType,
+          transactionHash,
+        },
+      },
+      { new: true, upsert: true, rawResult: true }
     );
-    // dailyTotalIncome, dailyLevelIncome, dailyDirectIncome, incomeType direct, level
 
-    console.log("Transaction inserted successfully:", transaction);
-    // console.log("got amount", amount)
-    if (incomeType === "direct") {
-      userInfo.dailyDirectIncome = (userInfo.dailyDirectIncome || 0) + amount;
-      // dailyTotalIncome
-      userInfo.dailyTotalIncome = (userInfo.dailyTotalIncome || 0) + amount;
+    // Check if the transaction was inserted new.
+    const isNewTransaction = !result.lastErrorObject.updatedExisting;
+    console.log("Is new transaction:", isNewTransaction);
+
+    if (isNewTransaction) {
+      // Update daily income fields only if the transaction is new.
+      if (incomeType === "direct") {
+        userInfo.dailyDirectIncome = (userInfo.dailyDirectIncome || 0) + amount;
+        userInfo.dailyTotalIncome = (userInfo.dailyTotalIncome || 0) + amount;
+      } else if (incomeType === "level") {
+        userInfo.dailyLevelIncome = (userInfo.dailyLevelIncome || 0) + amount;
+        userInfo.dailyTotalIncome = (userInfo.dailyTotalIncome || 0) + amount;
+      }
+    } else {
+      console.log("Transaction already exists. Skipping income update.");
     }
-    if (incomeType === "level") {
-      userInfo.dailyLevelIncome = (userInfo.dailyLevelIncome || 0) + amount;
-      userInfo.dailyTotalIncome = (userInfo.dailyTotalIncome || 0) + amount;
-    }
-    const receiverIncome = await getUserIncome(userInfo?.walletAddress);
-    const fromIncome = await getUserIncome(fromUser?.walletAddress);
+    // Refresh income details for the receiver.
+    const receiverIncome = await getUserIncome(userInfo.walletAddress);
     userInfo.income = {
       ...userInfo.income,
       ...receiverIncome.data,
     };
-    // update the userInfo isActive to true
     userInfo.isActive = true;
-
     await userInfo.save();
+
+    // Refresh income details for the sender.
+    const fromIncome = await getUserIncome(fromUser.walletAddress);
     fromUser.income = {
       ...fromUser.income,
       ...fromIncome.data,
     };
-
     await fromUser.save();
-    return transaction;
+
+    return result.value;
   } catch (error) {
     console.error("Error inserting transaction:", error);
     throw error;

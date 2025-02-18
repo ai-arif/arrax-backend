@@ -21,36 +21,35 @@ const insertTransaction = async ({
       throw new Error("From user not found");
     }
 
-    // Use $setOnInsert so that fields are only set when creating a new document.
-    // Also, use rawResult to check if the document was newly inserted.
-    const result = await Transaction.findOneAndUpdate(
-      {
+    // Check if a transaction matching the criteria already exists.
+    let transaction = await Transaction.findOne({
+      receiverId: userInfo.userId,
+      fromId: fromUser.userId,
+      amount,
+      level,
+    });
+
+    let isNewTransaction = false;
+    if (transaction) {
+      console.log("Transaction already exists. Skipping creation.");
+    } else {
+      console.log("No existing transaction found. Creating a new one.");
+      isNewTransaction = true;
+      transaction = new Transaction({
         receiverId: userInfo.userId,
+        receiver: user,
+        from,
         fromId: fromUser.userId,
         amount,
         level,
-      },
-      {
-        $setOnInsert: {
-          receiverId: userInfo.userId,
-          receiver: user,
-          from,
-          fromId: fromUser.userId,
-          amount,
-          level,
-          incomeType,
-          transactionHash,
-        },
-      },
-      { new: true, upsert: true, rawResult: true }
-    );
+        incomeType,
+        transactionHash,
+      });
+      await transaction.save();
+    }
 
-    // Check if the transaction was inserted new.
-    const isNewTransaction = !result.lastErrorObject.updatedExisting;
-    console.log("Is new transaction:", isNewTransaction);
-
+    // Update income fields only if this is a new transaction.
     if (isNewTransaction) {
-      // Update daily income fields only if the transaction is new.
       if (incomeType === "direct") {
         userInfo.dailyDirectIncome = (userInfo.dailyDirectIncome || 0) + amount;
         userInfo.dailyTotalIncome = (userInfo.dailyTotalIncome || 0) + amount;
@@ -59,8 +58,9 @@ const insertTransaction = async ({
         userInfo.dailyTotalIncome = (userInfo.dailyTotalIncome || 0) + amount;
       }
     } else {
-      console.log("Transaction already exists. Skipping income update.");
+      console.log("Income update skipped because transaction already exists.");
     }
+
     // Refresh income details for the receiver.
     const receiverIncome = await getUserIncome(userInfo.walletAddress);
     userInfo.income = {
@@ -78,7 +78,7 @@ const insertTransaction = async ({
     };
     await fromUser.save();
 
-    return result.value;
+    return transaction;
   } catch (error) {
     console.error("Error inserting transaction:", error);
     throw error;

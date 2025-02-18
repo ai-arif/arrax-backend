@@ -18,21 +18,18 @@ const {
 } = require("./controllers/RegisterationContractController");
 const { listenToEvents, getEventLogs } = require("./cmd/matrixListener");
 const { BN } = require("bn.js");
-const {
-  getUserSlot,
 
-  upgradeUserSlot,
-  getUserActiveSlots,
-  getUserStats,
-  getLevelReferralDetails,
-  getMatrixInfo,
-  getUserReferralStats,
-  getCurrentSlot,
-} = require("./controllers/bookingContractController");
+const { handleMissingUsers } = require("./cmd/runner");
+const job = require("./cmd/runner");
+const scheduleUserSync = require("./cmd/runner");
+const { scheduleDailyReset } = require("./cmd/resetDailyStats");
+const {
+  getMissingUserIds,
+  getAllPartners,
+  updateTeamsAndPartners,
+} = require("./services/userService");
 const User = require("./models/User");
-const Order = require("./models/Order");
-const Transaction = require("./models/Transaction");
-const scheduleEventSync = require("./cmd/slotRunner");
+
 // const { getSlotInfo } = require("./controllers/bookingContractController");
 const morganFormat =
   ":method :url :status :res[content-length] - :response-time ms";
@@ -69,23 +66,48 @@ app.get("/", (req, res) => {
 
 // get route which takes ?userId=2, then will delete all users greater than or equal 2, also delete all order and transacations
 app.get("/delete", async (req, res) => {
-  const userId = req.query.userId;
-  if (userId == 1) {
-    res.send("Cannot delete admin");
-    return;
-  }
-  try {
-    await User.deleteMany({ userId: { $gte: userId } });
-    await Order.deleteMany({ userId: { $gte: userId } });
-    await Transaction.deleteMany({
-      $or: [{ fromId: userId }, { receiverId: userId }],
-    });
-    res.send("Deleted");
-  } catch (error) {
-    res.send(error);
-  }
+  return "cannot delete";
 });
 
+app.get("/missing-users", async (req, res) => {
+  const data = await getMissingUserIds();
+  res.json(data);
+});
+
+app.get("/partners", async (req, res) => {
+  const userId = req.query.userId;
+  if (userId) {
+    const data = await getAllPartners(userId);
+    return res.json({
+      total: data.length,
+      data,
+    });
+  } else {
+    return res.json("userId is required");
+  }
+});
+app.get("/update-partners", async (req, res) => {
+  const data = await updateTeamsAndPartners();
+  return res.json({
+    message: "Team and Partners Updated",
+  });
+});
+
+app.get("/fix-refferal", async (req, res) => {
+  // get users that doesn't have refferedBy field value
+  const users = await User.find({ referredBy: { $exists: false } }).exec();
+  // loop through the users and update the referredBy field, search with walletAddress: user.referrerAddress and get the userId and update the referredBy field
+  users.forEach(async (user) => {
+    const referrer = await User.findOne({
+      walletAddress: user.referrerAddress,
+    }).exec();
+    if (referrer) {
+      user.referredBy = referrer.userId;
+      await user.save();
+    }
+  });
+  return res.json(users);
+});
 // Routes
 app.use("/api/home", homeRoutes);
 app.use("/api/users", userRoutes);
@@ -96,52 +118,10 @@ app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 
-// getUserInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd")
+// getUserInfo("0x7bfb305F96E6218acC22f85841961b93d1E9c252").then((data) => {
+//   console.log(data);
+// });
+
 listenToEvents();
-scheduleEventSync()
-// getEventLogs()
-
-// getSlotInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd")
-// getCurrentSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data)=> console.log(data))
-// getUserActiveSlots("0x786a7E3DD514E644f88DBE198A327Ab1CB6D8676").then((data) =>
-//   console.log("getUserActiveSlots", data)
-// );
-// getUserIncome("0x786a7E3DD514E644f88DBE198A327Ab1CB6D8676").then((data) =>
-//   console.log(data)
-// );
-// getCurrentSlot("0xb1d2CEaCA4e20904a4359eC6c993706b2b404fd1").then((data)=> console.log(data))
-// const referreInfo =  getUserInfo("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data)=> console.log(Number(data.data[0])))
-// getSlotData(0).then((data) => console.log(data));
-// getUserInfo("0x752d8836b2Bc92d8838668188CFbbD74a309F982").then((data) =>
-//   console.log(data)
-// );
-
-// getLevelReferralDetails("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd", 1).then(
-//   (data) => {
-//     const convertedDetails = JSON.parse(
-//       JSON.stringify(data, (_, value) =>
-//         typeof value === "bigint" ? value.toString() : value
-//       )
-//     );
-//     console.log(convertedDetails.data);
-//   }
-// );
-
-// Convert BigInt fields to string
-
-// getUserReferralStats("0x4Edcf95aDc616481a6f08a9bEaB934cA6e4040bd").then((data) =>
-//   console.log("getUserReferralStats", data)
-// );
-
-// getUserStats("0x786a7E3DD514E644f88DBE198A327Ab1CB6D8676").then((data) =>
-//   console.log("getUserStats", data)
-// );
-// getAdminStats().then((data)=>console.log(data))
-
-// getCurrentSlot("0x91fBa4A117dC5B356901Ee88d708432636995403").then((data) =>
-//   console.log("getUserSlot", data)
-// );
-
-// upgradeUserSlot("0x105E18D685d22eDF2d7a3dEb50a3A37F26E1C88D", 10).then((data) =>
-//   console.log(data)
-// );
+scheduleUserSync();
+scheduleDailyReset();

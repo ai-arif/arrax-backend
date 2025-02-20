@@ -1,7 +1,7 @@
 const { getUserSlot } = require("../controllers/bookingContractController");
 const Order = require("../models/Order");
 const User = require("../models/User");
-
+const BN = require("bn.js");
 const insertOrderInfo = async ({ user, level, price, transactionHash }) => {
   try {
     console.log("Order received:", {

@@ -11,6 +11,15 @@ const insertTransaction = async ({
   transactionHash,
 }) => {
   try {
+    console.log("Transaction received:", {
+      user,
+      from,
+      amount,
+      level,
+      incomeType,
+      transactionHash,
+    });
+
     const userInfo = await User.findOne({ walletAddress: user });
     if (!userInfo) {
       throw new Error("User not found");

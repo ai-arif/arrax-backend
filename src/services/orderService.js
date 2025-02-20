@@ -4,6 +4,12 @@ const User = require("../models/User");
 
 const insertOrderInfo = async ({ user, level, price, transactionHash }) => {
   try {
+    console.log("Order received:", {
+      user,
+      level,
+      price,
+      transactionHash,
+    });
     const userInfo = await User.findOne({ walletAddress: user });
     if (!userInfo) {
       throw new Error("User not found");
@@ -27,6 +33,10 @@ const insertOrderInfo = async ({ user, level, price, transactionHash }) => {
       }, // Data to update or insert
       { new: true, upsert: true } // Return the updated document and create if it doesn't exist
     );
+    if (!order) {
+      throw new Error("Failed to insert order info");
+    }
+    console.log("Order information upserted successfully", order?.userId);
 
     if (!userInfo.isActive) {
       userInfo.isActive = true;

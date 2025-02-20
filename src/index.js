@@ -93,6 +93,11 @@ app.get("/update-partners", async (req, res) => {
   });
 });
 
+app.get("/user-list", async (req, res) => {
+  const data = await User.find({}).exec();
+  return res.json(data);
+});
+
 app.get("/fix-refferal", async (req, res) => {
   // get users that doesn't have refferedBy field value
   const users = await User.find({ referredBy: { $exists: false } }).exec();
@@ -123,5 +128,5 @@ app.listen(port, () => {
 // });
 
 listenToEvents();
-scheduleUserSync();
+// scheduleUserSync();
 scheduleDailyReset();

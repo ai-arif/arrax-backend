@@ -29,6 +29,7 @@ const {
   updateTeamsAndPartners,
 } = require("./services/userService");
 const User = require("./models/User");
+const scheduleEventSync = require("./cmd/slotRunner");
 
 // const { getSlotInfo } = require("./controllers/bookingContractController");
 const morganFormat =
@@ -125,3 +126,4 @@ app.listen(port, () => {
 listenToEvents();
 scheduleUserSync();
 scheduleDailyReset();
+scheduleEventSync();

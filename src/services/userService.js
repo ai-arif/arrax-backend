@@ -134,14 +134,14 @@ const loginOrRegisterUser = async ({
           referrer.totalPartners += 1;
           referrer.dailyTeam += 1;
           referrer.dailyPartners += 1;
-          updateReferrerTeam(referrerBy, 1);
+          // updateReferrerTeam(referrerBy, 1);
           await referrer.save();
         }
-        handleMissingUsers();
+        // handleMissingUsers();
         return { user, token, isNewUser: true };
       } catch (error) {
         throw new Error(error.message);
-      }
+      }      
     }
   } catch (error) {
     console.error("Error registering user:", error.message);
@@ -262,7 +262,7 @@ const updateReferrerTeam = async (userId, team) => {
     user.totalTeam += team;
     user.dailyPartners += team;
     await user.save();
-  }
+  }  
 };
 
 // get user information by userId

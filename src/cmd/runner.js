@@ -8,6 +8,8 @@ const rpcURL = process.env.APP_RPC;
 const provider = new JsonRpcProvider(rpcURL);
 
 const getContract = () => {
+
+  
   try {
     const contract = new ethers.Contract(
       contractAddress,
@@ -33,7 +35,7 @@ const handleMissingUsers = async () => {
     const totalUsers = await contract.totalUsers();
     console.log("Total Users:", totalUsers);
 
-    for (let i = Number(totalUsers) - 100; i <= totalUsers; i++) {
+    for (let i = 1; i <= totalUsers; i++) {
       const user = await contract.getUserByUserId(i);
       if (user) {
         count++;

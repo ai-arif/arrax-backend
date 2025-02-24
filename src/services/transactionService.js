@@ -62,12 +62,15 @@ const insertTransaction = async ({
       console.log("new transaction");
 
       if (incomeType === "direct") {
-        userInfo.dailyDirectIncome =
-          (userInfo.dailyDirectIncome || 0n) + amount;
+        // userInfo.dailyDirectIncome =
+        //   (userInfo.dailyDirectIncome || 0n) + amount;
+        userInfo.dailyDirectIncome = ((BigInt(userInfo.dailyDirectIncome) || 0n) + amount).toString();
+        userInfo.dailyTotalIncome = ((BigInt(userInfo.dailyTotalIncome) || 0n) + amount).toString();
+
         userInfo.dailyTotalIncome = (userInfo.dailyTotalIncome || 0n) + amount;
       } else if (incomeType === "level") {
-        userInfo.dailyLevelIncome = (userInfo.dailyLevelIncome || 0n) + amount;
-        userInfo.dailyTotalIncome = (userInfo.dailyTotalIncome || 0n) + amount;
+        userInfo.dailyLevelIncome = ((BigInt(userInfo.dailyLevelIncome) || 0n) + amount).toString();
+        userInfo.dailyTotalIncome = ((BigInt(userInfo.dailyTotalIncome) || 0n) + amount).toString();
       }
     } else {
       console.log("Income update skipped because transaction already exists.");

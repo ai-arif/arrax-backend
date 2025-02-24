@@ -28,8 +28,8 @@ const userSchema = new mongoose.Schema(
     dailyTotalIncome: { type: Number, default: 0 },
     dailyLevelIncome: { type: Number, default: 0 },
     dailyDirectIncome: { type: Number, default: 0 },
+    dailyTotalIncome: { type: Number, default: 0 },
     currentActiveSlot: { type: Number, default: 0 }, // Current active slot
-
     roles: {
       type: [String],
       default: ["user"],

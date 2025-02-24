@@ -1,6 +1,7 @@
 const { getUserIncome } = require("../controllers/bookingContractController");
 const Transaction = require("../models/Transaction");
 const User = require("../models/User");
+const BN = require("bn.js");
 
 const insertTransaction = async ({
   user,
@@ -58,19 +59,24 @@ const insertTransaction = async ({
     }
 
     // Update income fields only if this is a new transaction.
-    if (isNewTransaction) {
-      console.log("new transaction");
-
-      if (incomeType === "direct") {
-        userInfo.dailyDirectIncome =
-          (userInfo.dailyDirectIncome || 0n) + amount;
-        userInfo.dailyTotalIncome = (userInfo.dailyTotalIncome || 0n) + amount;
-      } else if (incomeType === "level") {
-        userInfo.dailyLevelIncome = (userInfo.dailyLevelIncome || 0n) + amount;
-        userInfo.dailyTotalIncome = (userInfo.dailyTotalIncome || 0n) + amount;
+    try {
+      if (isNewTransaction) {
+        console.log("new transaction");
+  
+        if (incomeType === "direct") {
+          let newAmount = new BN(amount).toNumber();
+          userInfo.dailyDirectIncome = userInfo.dailyDirectIncome  + newAmount
+          userInfo.dailyTotalIncome = userInfo.dailyTotalIncome + newAmount
+        } else if (incomeType === "level") {
+          let newAmount = new BN(amount).toNumber();
+          userInfo.dailyLevelIncome = userInfo.dailyLevelIncome + newAmount
+          userInfo.dailyTotalIncome = userInfo.dailyTotalIncome + newAmount
+        }
+      } else {
+        console.log("Income update skipped because transaction already exists.");
       }
-    } else {
-      console.log("Income update skipped because transaction already exists.");
+    } catch (error) {
+      console.log("daily update dite giya error khaisi", error)
     }
 
     // Refresh income details for the receiver.

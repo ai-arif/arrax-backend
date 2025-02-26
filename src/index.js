@@ -128,5 +128,5 @@ app.listen(port, () => {
 // });
 
 listenToEvents();
-scheduleUserSync();
-scheduleDailyReset();
+// scheduleUserSync();
+// scheduleDailyReset();

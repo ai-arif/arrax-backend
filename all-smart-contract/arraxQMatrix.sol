@@ -510,233 +510,14 @@ contract ArraxQMatrix is Ownable, ReentrancyGuard, Pausable {
         uint256 directReward = (amount * 50) / 100;
 
         if (referrer != address(0)) {
-            // Check if referrer has upgraded to this level
-            if (!hasUpgraded[referrer][level]) {
-                // Instead of immediately sending to mother wallet, check upline referrers
-                address currentUpline = referrer;
-                bool foundQualifiedUpline = false;
-
-                // Loop through upline to find qualified referrer (who has upgraded to this level)
-                for (
-                    uint256 i = 0;
-                    i < 10 && currentUpline != address(0);
-                    i++
-                ) {
-                    // Get the upline of the current referrer
-                    (, , address upline, , , , ) = registration.getUserInfo(
-                        currentUpline
-                    );
-
-                    // Move to next upline
-                    currentUpline = upline;
-
-                    // If we found an upline that has upgraded to this level, send rewards to them
-                    if (
-                        currentUpline != address(0) &&
-                        hasUpgraded[currentUpline][level]
-                    ) {
-                        _sendReward(
-                            currentUpline,
-                            directReward,
-                            "inherited_direct"
-                        );
-                        userIncome[currentUpline].directIncome += directReward;
-                        emit RewardDistributed(
-                            currentUpline,
-                            user,
-                            directReward,
-                            level,
-                            "inherited_direct_reward"
-                        );
-                        foundQualifiedUpline = true;
-                        break;
-                    }
-                }
-
-                // If no qualified upline found, send to mother wallet
-                if (!foundQualifiedUpline) {
-                    _sendReward(motherWallet, directReward, "pending_upgrade");
-                    emit RewardDistributed(
-                        motherWallet,
-                        user,
-                        directReward,
-                        level,
-                        "pending_upgrade_reward"
-                    );
-                }
-            } else {
-                // Referrer has upgraded to this level - handle special cases
-
-                // Special handling for 3rd, 6th, 9th... referral at this level (divisible by 3)
-                if (referralPosition % 3 == 0) {
-                    (, , address referrersReferrer, , , , ) = registration
-                        .getUserInfo(referrer);
-
-                    if (
-                        referrersReferrer != address(0) &&
-                        hasUpgraded[referrersReferrer][level]
-                    ) {
-                        _sendReward(
-                            referrersReferrer,
-                            directReward,
-                            "direct_11th"
-                        );
-                        userIncome[referrersReferrer]
-                            .directIncome += directReward;
-                        emit RewardDistributed(
-                            referrersReferrer,
-                            user,
-                            directReward,
-                            level,
-                            "direct_11th_referral"
-                        );
-                    } else {
-                        // Find qualified upline if referrer's referrer doesn't qualify
-                        address currentUpline = referrersReferrer;
-                        bool foundQualifiedUpline = false;
-
-                        // Loop through upline to find qualified referrer
-                        for (
-                            uint256 i = 0;
-                            i < 10 && currentUpline != address(0);
-                            i++
-                        ) {
-                            // Get upline of the current referrer
-                            (, , address upline, , , , ) = registration
-                                .getUserInfo(currentUpline);
-
-                            // Move to next upline
-                            currentUpline = upline;
-
-                            // If we found a qualified upline, send rewards to them
-                            if (
-                                currentUpline != address(0) &&
-                                hasUpgraded[currentUpline][level]
-                            ) {
-                                _sendReward(
-                                    currentUpline,
-                                    directReward,
-                                    "inherited_third_direct"
-                                );
-                                userIncome[currentUpline]
-                                    .directIncome += directReward;
-                                emit RewardDistributed(
-                                    currentUpline,
-                                    user,
-                                    directReward,
-                                    level,
-                                    "inherited_third_direct_reward"
-                                );
-                                foundQualifiedUpline = true;
-                                break;
-                            }
-                        }
-
-                        // If no qualified upline found, send to mother wallet
-                        if (!foundQualifiedUpline) {
-                            _sendReward(
-                                motherWallet,
-                                directReward,
-                                "unclaimed_11th"
-                            );
-                            emit RewardDistributed(
-                                motherWallet,
-                                user,
-                                directReward,
-                                level,
-                                "unclaimed_11th_referral"
-                            );
-                        }
-                    }
-                }
-                // Enhanced recycle logic for 4th, 8th, 12th... referral (divisible by 4)
-                else if (referralPosition % 4 == 0) {
-                    // Find qualified upline for this special case
-                    address currentUpline = referrer;
-                    bool foundQualifiedUpline = false;
-
-                    // Loop through upline to find a qualified referrer for special recycling reward
-                    for (
-                        uint256 i = 0;
-                        i < 5 && currentUpline != address(0);
-                        i++
-                    ) {
-                        if (i == 0) {
-                            // First check the direct referrer (which we know is qualified)
-                            if (hasUpgraded[currentUpline][level]) {
-                                _recyclePosition(currentUpline, level);
-                                _sendReward(
-                                    motherWallet,
-                                    directReward,
-                                    "direct_12th"
-                                );
-                                emit RewardDistributed(
-                                    motherWallet,
-                                    user,
-                                    directReward,
-                                    level,
-                                    "direct_12th_referral"
-                                );
-                                foundQualifiedUpline = true;
-                                break;
-                            }
-                        } else {
-                            // Then check upline
-                            (, , address upline, , , , ) = registration
-                                .getUserInfo(currentUpline);
-                            currentUpline = upline;
-
-                            if (
-                                currentUpline != address(0) &&
-                                hasUpgraded[currentUpline][level]
-                            ) {
-                                _recyclePosition(currentUpline, level);
-                                _sendReward(
-                                    motherWallet,
-                                    directReward,
-                                    "inherited_direct_12th"
-                                );
-                                emit RewardDistributed(
-                                    motherWallet,
-                                    user,
-                                    directReward,
-                                    level,
-                                    "inherited_direct_12th_referral"
-                                );
-                                foundQualifiedUpline = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    // If no qualified upline found, just send to mother wallet without recycling
-                    if (!foundQualifiedUpline) {
-                        _sendReward(
-                            motherWallet,
-                            directReward,
-                            "unclaimed_12th"
-                        );
-                        emit RewardDistributed(
-                            motherWallet,
-                            user,
-                            directReward,
-                            level,
-                            "unclaimed_12th_referral"
-                        );
-                    }
-                } else {
-                    // Normal referral case - direct to referrer
-                    _sendReward(referrer, directReward, "direct");
-                    userIncome[referrer].directIncome += directReward;
-                    emit RewardDistributed(
-                        referrer,
-                        user,
-                        directReward,
-                        level,
-                        "direct"
-                    );
-                }
-            }
+            // Distribute direct reward (50%) to qualified upline
+            _distributeDirectReward(
+                user,
+                referrer,
+                level,
+                directReward,
+                referralPosition
+            );
         } else {
             // No referrer case - send to mother wallet
             _sendReward(motherWallet, directReward, "unclaimed_direct");
@@ -774,6 +555,7 @@ contract ArraxQMatrix is Ownable, ReentrancyGuard, Pausable {
             if (current == address(0) || !hasUpgraded[current][level]) {
                 // If not, add reward to unclaimed for next qualified upline
                 unclaimedReward = levelReward;
+                current = upline;
                 continue; // Skip to next upline
             }
 
@@ -828,6 +610,217 @@ contract ArraxQMatrix is Ownable, ReentrancyGuard, Pausable {
 
         // Update last slot purchaser
         lastSlotPurchaser[level] = user;
+    }
+
+    // New helper function to handle direct reward distribution more effectively
+    function _distributeDirectReward(
+        address user,
+        address referrer,
+        uint256 level,
+        uint256 directReward,
+        uint256 referralPosition
+    ) internal {
+        // Check if referrer has upgraded to this level
+        if (!hasUpgraded[referrer][level]) {
+            // Find the nearest qualified upline
+            address[] memory qualifiedUplines = new address[](10); // Store qualified uplines
+            uint256 qualifiedCount = 0;
+
+            address currentUpline = referrer;
+
+            // Loop through upline to find all qualified referrers (who have upgraded to this level)
+            for (uint256 i = 0; i < 10 && currentUpline != address(0); i++) {
+                // Get the upline of the current referrer
+                (, , address upline, , , , ) = registration.getUserInfo(
+                    currentUpline
+                );
+
+                // Move to next upline
+                currentUpline = upline;
+
+                // If we found an upline that has upgraded to this level, store it
+                if (
+                    currentUpline != address(0) &&
+                    hasUpgraded[currentUpline][level]
+                ) {
+                    qualifiedUplines[qualifiedCount] = currentUpline;
+                    qualifiedCount++;
+                }
+            }
+
+            // If qualified uplines found, distribute to them with priority to closest upline
+            if (qualifiedCount > 0) {
+                address nearestQualified = qualifiedUplines[0];
+
+                // Special case handling for every 3rd referral
+                if (referralPosition % 3 == 0 && qualifiedCount > 1) {
+                    // Send to second nearest qualified upline for 3rd, 6th, 9th referrals
+                    _sendReward(
+                        qualifiedUplines[1],
+                        directReward,
+                        "inherited_third_direct"
+                    );
+                    userIncome[qualifiedUplines[1]]
+                        .directIncome += directReward;
+                    emit RewardDistributed(
+                        qualifiedUplines[1],
+                        user,
+                        directReward,
+                        level,
+                        "inherited_third_direct_reward"
+                    );
+                }
+                // Special case for 4th, 8th, 12th referrals (recycling)
+                else if (referralPosition % 4 == 0) {
+                    // Recycle the nearest qualified upline and send reward to admin
+                    _recyclePosition(nearestQualified, level);
+                    _sendReward(
+                        motherWallet,
+                        directReward,
+                        "inherited_direct_12th"
+                    );
+                    emit RewardDistributed(
+                        motherWallet,
+                        user,
+                        directReward,
+                        level,
+                        "inherited_direct_12th_referral"
+                    );
+                } else {
+                    // Normal case: send to nearest qualified upline
+                    _sendReward(
+                        nearestQualified,
+                        directReward,
+                        "inherited_direct"
+                    );
+                    userIncome[nearestQualified].directIncome += directReward;
+                    emit RewardDistributed(
+                        nearestQualified,
+                        user,
+                        directReward,
+                        level,
+                        "inherited_direct_reward"
+                    );
+                }
+            } else {
+                // If no qualified upline found, send to mother wallet
+                _sendReward(motherWallet, directReward, "pending_upgrade");
+                emit RewardDistributed(
+                    motherWallet,
+                    user,
+                    directReward,
+                    level,
+                    "pending_upgrade_reward"
+                );
+            }
+        } else {
+            // Referrer has upgraded to this level - handle special cases
+
+            // Special handling for 3rd, 6th, 9th... referral at this level (divisible by 3)
+            if (referralPosition % 3 == 0) {
+                (, , address referrersReferrer, , , , ) = registration
+                    .getUserInfo(referrer);
+
+                if (
+                    referrersReferrer != address(0) &&
+                    hasUpgraded[referrersReferrer][level]
+                ) {
+                    _sendReward(referrersReferrer, directReward, "direct_3rd");
+                    userIncome[referrersReferrer].directIncome += directReward;
+                    emit RewardDistributed(
+                        referrersReferrer,
+                        user,
+                        directReward,
+                        level,
+                        "direct_3rd_referral"
+                    );
+                } else {
+                    // Find qualified upline if referrer's referrer doesn't qualify
+                    address currentUpline = referrersReferrer;
+                    bool foundQualifiedUpline = false;
+
+                    // Loop through upline to find qualified referrer
+                    for (
+                        uint256 i = 0;
+                        i < 10 && currentUpline != address(0);
+                        i++
+                    ) {
+                        // Get upline of the current referrer
+                        (, , address upline, , , , ) = registration.getUserInfo(
+                            currentUpline
+                        );
+
+                        // Move to next upline
+                        currentUpline = upline;
+
+                        // If we found a qualified upline, send rewards to them
+                        if (
+                            currentUpline != address(0) &&
+                            hasUpgraded[currentUpline][level]
+                        ) {
+                            _sendReward(
+                                currentUpline,
+                                directReward,
+                                "inherited_third_direct"
+                            );
+                            userIncome[currentUpline]
+                                .directIncome += directReward;
+                            emit RewardDistributed(
+                                currentUpline,
+                                user,
+                                directReward,
+                                level,
+                                "inherited_third_direct_reward"
+                            );
+                            foundQualifiedUpline = true;
+                            break;
+                        }
+                    }
+
+                    // If no qualified upline found, send to mother wallet
+                    if (!foundQualifiedUpline) {
+                        _sendReward(
+                            motherWallet,
+                            directReward,
+                            "unclaimed_3rd"
+                        );
+                        emit RewardDistributed(
+                            motherWallet,
+                            user,
+                            directReward,
+                            level,
+                            "unclaimed_3rd_referral"
+                        );
+                    }
+                }
+            }
+            // Enhanced recycle logic for 4th, 8th, 12th... referral (divisible by 4)
+            else if (referralPosition % 4 == 0) {
+                // First recycle the direct referrer since they are qualified
+                _recyclePosition(referrer, level);
+
+                // Send reward to mother wallet after recycling
+                _sendReward(motherWallet, directReward, "direct_4th");
+                emit RewardDistributed(
+                    motherWallet,
+                    user,
+                    directReward,
+                    level,
+                    "direct_4th_referral"
+                );
+            } else {
+                // Normal referral case - direct to referrer
+                _sendReward(referrer, directReward, "direct");
+                userIncome[referrer].directIncome += directReward;
+                emit RewardDistributed(
+                    referrer,
+                    user,
+                    directReward,
+                    level,
+                    "direct"
+                );
+            }
+        }
     }
 
     // New helper function to verify recycle conditions

@@ -122,8 +122,8 @@ contract ArraxQMatrix is Ownable, ReentrancyGuard, Pausable {
         960e18,
         1920e18
     ];
-    uint256 constant MATRIX_SIZE = 4;
-    uint256 constant RECYCLE_THRESHOLD = 4;
+    uint256 constant MATRIX_SIZE = 12;
+    uint256 constant RECYCLE_THRESHOLD = 12;
     uint256 public BSC_FEE;
 
     // Mappings
@@ -135,8 +135,8 @@ contract ArraxQMatrix is Ownable, ReentrancyGuard, Pausable {
     mapping(address => mapping(address => uint256)) public referralPositions;
     mapping(address => mapping(uint256 => uint256)) public levelReferralCounts;
 
-    uint256 public constant SPECIAL_POSITION_1 = 3;
-    uint256 public constant SPECIAL_POSITION_2 = 4;
+    uint256 public constant SPECIAL_POSITION_1 = 11;
+    uint256 public constant SPECIAL_POSITION_2 = 12;
 
     address public motherWallet;
     address public bscFeeWallet;
@@ -652,9 +652,9 @@ contract ArraxQMatrix is Ownable, ReentrancyGuard, Pausable {
             if (qualifiedCount > 0) {
                 address nearestQualified = qualifiedUplines[0];
 
-                // Special case handling for every 3rd referral
-                if (referralPosition % 3 == 0 && qualifiedCount > 1) {
-                    // Send to second nearest qualified upline for 3rd, 6th, 9th referrals
+                // Special case handling for every 11rd referral
+                if (referralPosition % 11 == 0 && qualifiedCount > 1) {
+                    // Send to second nearest qualified upline for 11th, 22th, 33th... referrals
                     _sendReward(
                         qualifiedUplines[1],
                         directReward,
@@ -670,8 +670,8 @@ contract ArraxQMatrix is Ownable, ReentrancyGuard, Pausable {
                         "inherited_third_direct_reward"
                     );
                 }
-                // Special case for 4th, 8th, 12th referrals (recycling)
-                else if (referralPosition % 4 == 0) {
+                // Special case for 12th referrals (recycling)
+                else if (referralPosition % 12 == 0) {
                     // Recycle the nearest qualified upline and send reward to admin
                     _recyclePosition(nearestQualified, level);
                     _sendReward(
@@ -716,8 +716,8 @@ contract ArraxQMatrix is Ownable, ReentrancyGuard, Pausable {
         } else {
             // Referrer has upgraded to this level - handle special cases
 
-            // Special handling for 3rd, 6th, 9th... referral at this level (divisible by 3)
-            if (referralPosition % 3 == 0) {
+            // Special handling for 11th referral at this level (divisible by 11)
+            if (referralPosition % 11 == 0) {
                 (, , address referrersReferrer, , , , ) = registration
                     .getUserInfo(referrer);
 
@@ -725,14 +725,14 @@ contract ArraxQMatrix is Ownable, ReentrancyGuard, Pausable {
                     referrersReferrer != address(0) &&
                     hasUpgraded[referrersReferrer][level]
                 ) {
-                    _sendReward(referrersReferrer, directReward, "direct_3rd");
+                    _sendReward(referrersReferrer, directReward, "direct_11th");
                     userIncome[referrersReferrer].directIncome += directReward;
                     emit RewardDistributed(
                         referrersReferrer,
                         user,
                         directReward,
                         level,
-                        "direct_3rd_referral"
+                        "direct_11th_referral"
                     );
                 } else {
                     // Find qualified upline if referrer's referrer doesn't qualify
@@ -782,31 +782,31 @@ contract ArraxQMatrix is Ownable, ReentrancyGuard, Pausable {
                         _sendReward(
                             motherWallet,
                             directReward,
-                            "unclaimed_3rd"
+                            "unclaimed_11th"
                         );
                         emit RewardDistributed(
                             motherWallet,
                             user,
                             directReward,
                             level,
-                            "unclaimed_3rd_referral"
+                            "unclaimed_11th_referral"
                         );
                     }
                 }
             }
-            // Enhanced recycle logic for 4th, 8th, 12th... referral (divisible by 4)
-            else if (referralPosition % 4 == 0) {
+            // Enhanced recycle logic for 12th referral (divisible by 12)
+            else if (referralPosition % 12 == 0) {
                 // First recycle the direct referrer since they are qualified
                 _recyclePosition(referrer, level);
 
                 // Send reward to mother wallet after recycling
-                _sendReward(motherWallet, directReward, "direct_4th");
+                _sendReward(motherWallet, directReward, "direct_12th");
                 emit RewardDistributed(
                     motherWallet,
                     user,
                     directReward,
                     level,
-                    "direct_4th_referral"
+                    "direct_12th_referral"
                 );
             } else {
                 // Normal referral case - direct to referrer

@@ -11,7 +11,7 @@ jobs:
       - name: 📂 Sync files
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
-          server: mainulhasan99.xyz
+          server: bravo.bdnameserver.com
           username: arrax_arrax.mainulhasan99.xyz
           password: NwmFNNiPM6V
-          log-level: verbose
+          # log-level: verbose

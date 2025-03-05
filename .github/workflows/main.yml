@@ -14,3 +14,5 @@ jobs:
           server: mainulhasan99.xyz
           username: arrax_arrax.mainulhasan99.xyz
           password: NwmFNNiPM6V
+          secure: true
+          log-level: verbose

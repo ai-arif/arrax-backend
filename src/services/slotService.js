@@ -107,7 +107,7 @@ const upgradeAnotherUserSlot = async (userAddress, level) => {
     console.log("level", level);
     console.log("userAddress", userAddress);
 
-    const upgradeUser = await upgradeUserSlot(userAddress, level);
+    // const upgradeUser = await upgradeUserSlot(userAddress, level);
 
     const currentSlot = await getUserSlot(userAddress);
     const activeSlot = currentSlot?.activeSlot;

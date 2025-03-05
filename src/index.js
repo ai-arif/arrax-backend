@@ -123,7 +123,7 @@ app.listen(port, () => {
 //   console.log(data);
 // });
 
-listenToEvents();
-scheduleUserSync();
+// listenToEvents();
+// scheduleUserSync();
+// scheduleEventSync();
 scheduleDailyReset();
-scheduleEventSync();

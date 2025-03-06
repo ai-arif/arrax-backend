@@ -8,11 +8,6 @@
 			},
 			{
 				"internalType": "address",
-				"name": "_tokenAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
 				"name": "_feeCollector",
 				"type": "address"
 			}
@@ -28,6 +23,11 @@
 	{
 		"inputs": [],
 		"name": "CannotReferSelf",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "InsufficientPayment",
 		"type": "error"
 	},
 	{
@@ -70,17 +70,6 @@
 	{
 		"inputs": [],
 		"name": "OwnerNotRegistered",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "token",
-				"type": "address"
-			}
-		],
-		"name": "SafeERC20FailedOperation",
 		"type": "error"
 	},
 	{
@@ -144,19 +133,6 @@
 			}
 		],
 		"name": "Paused",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "newToken",
-				"type": "address"
-			}
-		],
-		"name": "PaymentTokenUpdated",
 		"type": "event"
 	},
 	{
@@ -436,19 +412,6 @@
 	},
 	{
 		"inputs": [],
-		"name": "paymentToken",
-		"outputs": [
-			{
-				"internalType": "contract IERC20",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "registerOwner",
 		"outputs": [],
 		"stateMutability": "nonpayable",
@@ -474,7 +437,7 @@
 		],
 		"name": "registerUser",
 		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{

@@ -17,7 +17,7 @@ const {
 const { loginOrRegisterUser } = require("./services/userService");
 
 const print = async () => {
-  console.log(await isPaused());
+  // console.log(await isPaused());
   // console.log(await getSlotData(0));
 };
 
